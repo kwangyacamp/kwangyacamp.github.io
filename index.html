@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kwangya Camp </title>
+    <meta name="robots" content="noindex">
+
+    <link rel="stylesheet" href="./style.css">
+
+    <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-firestore.js"></script>
+    <script src="scripts/firebase.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.semanticui.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+</head>
+
+<body>
+    <h1 class="title">Kwangya Camp Database</h1>
+
+    <button id="load-button" style="display: none;">Update Database</button>
+
+    <div class="container">
+        <div class="flex">
+            <div class="login-box left-sidebar">
+                <h2>Register Student Face Claim</h2>
+                <form>
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="faceclaim">
+                        <label>Face Claim</label>
+                    </div>
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="clanname">
+                        <label>Clan Name</label>
+                    </div>
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="yourname">
+                        <label>Your Name</label>
+                    </div>
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="prodigium">
+                        <label>Prodigium</label>
+                    </div>
+                    <div class="user-box">
+                        <select name="cars" id="status">
+                            <option value="NPA Student">NPA Student</option>
+                            <option value="NPA Staff">NPA Staff</option>
+                            <option value="Non-NPA Student">non-NPA Student</option>
+                            <option value="Family">Family</option>
+                        </select>
+                    </div>
+
+                    <a href="#" id="register-button">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        Register
+                    </a>
+                </form>
+            </div>
+
+            <div class="right-sidebar">
+                <div class="login-box visible">
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="search-bar">
+                        <label>Search</label>
+                    </div>
+
+                    <table id="table_id" class="ui celled table visible">
+                        <thead>
+                            <tr>
+                                <th>Actions</th>
+                                <th>FaceClaim</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Cabin</th>
+                                <th>Weapons</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <th>Actions</th>
+                                <th>FaceClaim</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Cabin</th>
+                                <th>Weapons</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay hidden">
+        <div class="login-box overlay-box hidden" id="edit-box">
+            <h2>Edit Face Claim</h2>            
+            <form>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="edit-faceclaim">
+                    <label>Face Claim</label>
+                </div>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="edit-clanname">
+                    <label>Clan Name</label>
+                </div>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="edit-name">
+                    <label>Your Name</label>
+                </div>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="edit-prodigy">
+                    <label>Prodigium</label>
+                </div>
+                <div class="user-box">
+                    <select name="status" id="edit-status">
+                        <option value="NPA Student">NPA Student</option>
+                        <option value="NPA Staff">NPA Staff</option>
+                        <option value="Non-NPA Student">non-NPA Student</option>
+                        <option value="Family">Family</option>
+                    </select>
+                </div>
+
+                <a href="#" id="edit-button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Edit
+                </a>
+            </form>
+        </div>
+
+        <div class="login-box overlay-box hidden" id="login-box">
+            <h2>Login</h2>            
+            <form>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="username">
+                    <label>Username</label>
+                </div>
+                <div class="user-box">
+                    <input type="password" name="" required="" id="password">
+                    <label>Password</label>
+                </div>
+                <a href="#" id="login-button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Login
+                </a>
+            </form>
+        </div>
+
+        <!-- <div class="overlay-box login-box" id="warning-box">
+            <form>
+                <h2 style="color: white">
+                    Hi, please login with<br/><br/>
+                    email: npacivitas@npa.com<br/>
+                    password: neoprodigyacademy
+                </h2>
+                <a href="#" id="close-warning-button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Login Here
+                </a>
+            </form>
+        </div> -->
+
+    </div>
+    <script src="./script.js"></script>
+    <!-- <script src="./login.js"></script> -->
+</body>
+
+</html>
