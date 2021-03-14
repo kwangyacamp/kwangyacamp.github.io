@@ -24,36 +24,51 @@
 <body>
     <h1 class="title">Kwangya Camp Database</h1>
 
-    <button id="load-button" style="display: none;">Update Database</button>
-
     <div class="container">
         <div class="flex">
             <div class="login-box left-sidebar">
-                <h2>Register Student Face Claim</h2>
+                <h2>New Demigod Biodata</h2>
                 <form>
                     <div class="user-box">
-                        <input type="text" name="" required="" id="faceclaim">
+                        <input type="text" name="" required="" id="first-name">
+                        <label>First Name</label>
+                    </div>
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="last-name">
+                        <label>Last Name</label>
+                    </div>
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="face-claim">
                         <label>Face Claim</label>
                     </div>
                     <div class="user-box">
-                        <input type="text" name="" required="" id="clanname">
-                        <label>Clan Name</label>
-                    </div>
-                    <div class="user-box">
-                        <input type="text" name="" required="" id="yourname">
-                        <label>Your Name</label>
-                    </div>
-                    <div class="user-box">
-                        <input type="text" name="" required="" id="prodigium">
-                        <label>Prodigium</label>
-                    </div>
-                    <div class="user-box">
-                        <select name="cars" id="status">
-                            <option value="NPA Student">NPA Student</option>
-                            <option value="NPA Staff">NPA Staff</option>
-                            <option value="Non-NPA Student">non-NPA Student</option>
-                            <option value="Family">Family</option>
+                        <select name="cars" id="cabin">
+                            <option value="Aphrodite">Aphrodite</option>
+                            <option value="Apollo">Apollo</option>
+                            <option value="Ares">Ares</option>
+                            <option value="Athena">Athena</option>
+                            <option value="Demeter">Demeter</option>
+                            <option value="Dionysus">Dionysus</option>
+                            <option value="Hephaestus">Hephaestus</option>
+                            <option value="Hermes">Hermes</option>
                         </select>
+                        <label>Descendant of</label>
+                    </div>
+                    <div class="user-box">
+                        <textarea id="ability-1"></textarea>
+                        <label>Ability 1 (mandatory)</label>
+                    </div>
+                    <div class="user-box">
+                        <textarea id="ability-2"></textarea>
+                        <label>Ability 2 (optional)</label>
+                    </div>
+                    <div class="user-box">
+                        <textarea id="ability-3"></textarea>
+                        <label>Ability 3 (optional)</label>
+                    </div>
+                    <div class="user-box">
+                        <input type="text" name="" required="" id="weapon">
+                        <label>Weapon</label>
                     </div>
 
                     <a href="#" id="register-button">
@@ -81,7 +96,10 @@
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Cabin</th>
-                                <th>Weapons</th>
+                                <th>Ability 1</th>
+                                <th>Ability 2</th>
+                                <th>Ability 3</th>
+                                <th>Weapon</th>
                             </tr>
                         </thead>
                         <tfoot>
@@ -91,7 +109,10 @@
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Cabin</th>
-                                <th>Weapons</th>
+                                <th>Ability 1</th>
+                                <th>Ability 2</th>
+                                <th>Ability 3</th>
+                                <th>Weapon</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -160,24 +181,6 @@
                 </a>
             </form>
         </div>
-
-        <!-- <div class="overlay-box login-box" id="warning-box">
-            <form>
-                <h2 style="color: white">
-                    Hi, please login with<br/><br/>
-                    email: npacivitas@npa.com<br/>
-                    password: neoprodigyacademy
-                </h2>
-                <a href="#" id="close-warning-button">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    Login Here
-                </a>
-            </form>
-        </div> -->
-
     </div>
     <script src="./script.js"></script>
     <!-- <script src="./login.js"></script> -->

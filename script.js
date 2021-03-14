@@ -1,9 +1,3 @@
-const faceclaim = document.querySelector("#faceclaim");
-const clanname = document.querySelector("#clanname");
-const yourname = document.querySelector("#yourname");
-const prodigium = document.querySelector("#prodigium");
-const status = document.querySelector("#status");
-const registerbutton = document.querySelector("#register-button");
 const searchBar = document.querySelector("#search-bar");
 
 const overlay = document.querySelector(".overlay");
@@ -17,10 +11,17 @@ const editProdigy = document.querySelector("#edit-prodigy");
 const editStatus = document.querySelector("#edit-status");
 const editButton = document.querySelector("#edit-button");
 
-const loadButton = document.querySelector("#load-button");
-
-const warningBox = document.querySelector('#warning-box');
-const closeWarningButton = document.querySelector('#close-warning-button');
+const registerForm = {
+    firstName: document.querySelector("#first-name"),
+    lastName: document.querySelector("#last-name"),
+    faceClaim: document.querySelector("#face-claim"),
+    cabin: document.querySelector("#cabin"),
+    weapon: document.querySelector("#weapon"),
+    ability1: document.querySelector("#ability-1"),
+    ability2: document.querySelector("#ability-2"),
+    ability3: document.querySelector("#ability-3"),
+    submit: document.querySelector("#register-button")
+}
 
 class User {
     constructor(user) {
@@ -28,12 +29,19 @@ class User {
         this.lastName = user.lastName;
         this.cabin = user.cabin;
         this.faceClaim = user.faceClaim;
-        this.weapons = user.weapons;
-        this.abilities = user.abilities
+        
         if (!user.id) {
             this.id = this.getID();
         } else {
             this.id = user.id;
+        }
+
+        this.weapon = user.weapon;
+        this.abilities = [null, null, null];
+        if (user.abilities != null && user.abilities.length > 0) {
+            user.abilities.forEach((ability, index) => {
+                this.abilities[index] = ability;
+            })
         }
     }
 
@@ -44,7 +52,7 @@ class User {
             lastName: this.lastName,
             cabin: this.cabin,
             faceClaim: this.faceClaim,
-            weapons: this.weapons,
+            weapon: this.weapon,
             abilities: this.abilities
         }
     }
@@ -94,10 +102,48 @@ const COLLECTION_ID = "trainees";
 const DOC_ID = "users"
 const DB_ID = "members"
 
-let ghost = new User({ firstName: "Jin", lastName: "Sakai", cabin: "Ghost", faceClaim: "imgur.com", weapons: [], abilities: [] });
-let shimura = new User({ firstName: "Lord", lastName: "Shimura", cabin: "Samurai", faceClaim: "imgur.com", weapons: [], abilities: [] });
+let ghost = new User({
+    firstName: "Jin",
+    lastName: "Sakai",
+    cabin: "Ghost",
+    faceClaim: "imgur.com",
+    weapon: "Katana & Tanto",
+    abilities: ["Heavenly Strike", "Perfect Parry", "Perfect Dodge"]
+});
+let shimura = new User({
+    firstName: "Lord",
+    lastName: "Shimura",
+    cabin: "Samurai",
+    faceClaim: "imgur.com",
+    weapon: "Katana",
+    abilities: ["Honor"]
+});
 
-function registerUser(newUser) {
+function registerUser() {
+    var newUser = null;
+    if (registerForm.firstName.value &&
+        registerForm.lastName.value &&
+        registerForm.faceClaim.value &&
+        registerForm.cabin.value &&
+        registerForm.weapon.value &&
+        registerForm.ability1.value
+        ) {
+        newUser = new User({
+            firstName: registerForm.firstName.value,
+            lastName: registerForm.lastName.value,
+            cabin: registerForm.cabin.value,
+            faceClaim: registerForm.faceClaim.value,
+            weapon: registerForm.weapon.value,
+            abilities: [
+                registerForm.ability1.value,
+                registerForm.ability2.value,
+                registerForm.ability3.value
+            ]
+        });
+    } else {
+        alert("All mandatory fields should be filled!");
+        return;
+    }
     let docRef = db.collection(COLLECTION_ID)
         .withConverter(listConverter)
         .doc(DOC_ID);
@@ -113,8 +159,10 @@ function registerUser(newUser) {
             });
     }).then(() => {
         console.log("Data appended successfully");
+        location.reload();
     }).catch((error) => {
         console.log("Error: " + error);
+        alert(`Error: ${error}`);
     })
 }
 
@@ -132,40 +180,7 @@ function loadUsers() {
         })
 }
 
-function register() {
-    if (faceclaim.value && clanname.value && yourname.value && prodigium.value && status.value) {
-        var biodata = {
-            faceClaim: faceclaim.value,
-            clanName: clanname.value,
-            name: yourname.value,
-            prodigy: prodigium.value,
-            statusOfFaceClaim: status.value
-        };
-
-        user = biodata;
-
-        db.collection("NPA-DB")
-            .add(biodata)
-            .then((docRef) => {
-                console.log("Document written with ID: ", docRef.id);
-                alert("Data successfully registered! Your data will be displayed after 1x24 hour.\nIf no changes present, please contact admin to make sure your data is up-to-date"); faceclaim.value = "";
-                clanname.value = "";
-                yourname.value = "";
-                prodigium.value = "";
-                status.value = "";
-
-                location.reload();
-            })
-            .catch((error) => {
-                console.error("Error adding document: ", error);
-                alert(error);
-            })
-    } else {
-        alert("All fields should be filled!");
-    }
-}
-
-registerbutton.addEventListener("click", register);
+registerForm.submit.addEventListener("click", registerUser);
 
 var table;
 
@@ -177,23 +192,24 @@ function renderTable(dataset) {
         dom: '<"top"i>rt<"bottom"><"clear">',
         columnDefs: [{
             targets: 0,
-            width: "20%",
             render: function (data, type, row, meta) {
                 if (type === 'display') {
-                    data = '<span class="material-icons mdl-button margin-r8" onClick="showEditCivitas(\'' + data + '\')">edit</span>' +
-                        '<span class="material-icons mdl-button" onClick="deleteCivitas(\'' + data + '\')">delete_forever</span>';
-                    // data = '<a href="' + data + '">' + data + '</a>';
+                    data = `<span class="material-icons mdl-button margin-r8" onClick="showEditCivitas('${data}')">edit</span>
+                    <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span>`;
                 }
                 return data;
             }
         }],
         columns: [
-            { data: 'id', width: "80px" },
+            { data: 'id', width: "50px" },
             { data: 'faceClaim' },
             { data: 'firstName' },
             { data: 'lastName' },
             { data: 'cabin' },
-            { data: 'weapons' }
+            { data: 'abilities.0' },
+            { data: 'abilities.1' },
+            { data: 'abilities.2' },
+            { data: 'weapon' }
         ]
     });
 
@@ -204,40 +220,7 @@ function renderTable(dataset) {
     });
 }
 
-var queryResult = [];
-
-function loadThenConvert() {
-    db.collection("NPA-DB").get()
-        .then(function (querySnapshot) {
-            // on success, create dataset list
-            var i = 0;
-            queryResult = []; // reset to empty
-            querySnapshot.forEach(function (doc) {
-                let student = doc.data();
-                queryResult.push({
-                    index: i,
-                    id: doc.id,
-                    faceClaim: student.faceClaim,
-                    clanName: student.clanName,
-                    name: student.name,
-                    prodigy: student.prodigy,
-                    statusOfFaceClaim: student.statusOfFaceClaim,
-                });
-                i++;
-            });
-
-            updateDatabase(queryResult);
-
-            // prepare data table
-            // prepareTable(queryResult);
-        })
-        .catch(function (error) {
-            alert(error);
-        });
-}
-
-var preParse = "";
-function deleteCivitas(id) {
+function deleteUser(id) {
     let user = userCollection[id];
     if (user) {
         if (confirm("Are you sure you want to delete?")) {
@@ -255,13 +238,13 @@ function deleteCivitas(id) {
                     });
             }).then(() => {
                 console.log("Data removed successfully");
+                location.reload();
             }).catch((error) => {
                 console.log("Error: " + error);
             })
         }
     }
 }
-
 
 var selectedID = null;
 
@@ -288,7 +271,7 @@ function showEditCivitas(id) {
         editClan.value = civitas.firstName;
         editName.value = civitas.lastName;
         editProdigy.value = civitas.cabin;
-        editStatus.value = civitas.weapons;
+        editStatus.value = civitas.weapon;
     }
 }
 
@@ -331,18 +314,6 @@ function saveSingleDataset(data, refresh = false) {
         });
 }
 
-function convertDataset(dataset) {
-    var doc = {
-        lastUpdate: new Date(),
-        civitas: []
-    };
-
-    // doc.civitas = dataset.map((student) => student);
-    doc.civitas = dataset.reduce((obj, student) => Object.assign(obj, { [student.id]: student }), {});
-
-    saveSingleDataset(doc, true); // convert multidocs to single doc
-}
-
 var queryDocument = null;
 
 function updateDatabase(dataset) {
@@ -362,21 +333,6 @@ function updateDatabase(dataset) {
             saveSingleDataset(students, true);
         })
 }
-
-function loadSingleDatabase() {
-    db.collection(COLLECTION_ID).doc(DOC_ID).get()
-        .then(function (doc) {
-            queryDocument = doc.data();
-            queryResult = Object.keys(queryDocument.users).map((id) => queryDocument.users[id]);
-            // prepare data table
-            renderTable(queryResult);
-        })
-        .catch(function (error) {
-            alert(error);
-        });
-}
-
-loadButton.addEventListener("click", () => { loadThenConvert(); });
 
 function dumpToCSV() {
     var output = "ID;Clan;Name;Prodigy;Status";

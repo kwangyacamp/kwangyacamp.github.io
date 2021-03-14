@@ -21,7 +21,7 @@ body {
 }
 
 .container {
-  width: 1280px;
+  width: 1600px;
   margin: 0 auto;
 }
 
@@ -71,12 +71,14 @@ body {
     position: relative;
   }
   
-  .login-box .user-box input,select {
+  .login-box .user-box input,
+  .login-box .user-box select,
+  .login-box .user-box textarea {
     width: 100%;
     padding: 10px 0;
     font-size: 16px;
     color: #fff;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     border: none;
     border-bottom: 1px solid #fff;
     outline: none;
@@ -96,11 +98,14 @@ body {
     font-size: 16px;
     color: #fff;
     pointer-events: none;
-    transition: .5s;
+    transition: .3s;
   }
   
   .login-box .user-box input:focus ~ label,
-  .login-box .user-box input:valid ~ label {
+  .login-box .user-box input:valid ~ label,
+  .login-box .user-box textarea:focus ~ label,
+  .login-box .user-box textarea:valid ~ label,
+  .login-box .user-box select ~ label {
     top: -20px;
     left: 0;
     color: #03e9f4;
