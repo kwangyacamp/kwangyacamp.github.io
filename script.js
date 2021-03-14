@@ -342,3 +342,39 @@ function closeOverlay() {
 }
 
 window.onload = loadUsers;
+
+let hyomin = new User({
+    firstName: "Choi",
+    lastName: "HHyomin",
+    cabin: "Athena",
+    faceClaim: "Chuuunibyou",
+    weapon: "Overture (a transforming gunblade) or Bisecting Shears (a pair siderite blades)",
+    abilities: [
+        "Inspiring Wisdom (rally people and boost morale)",
+        "Inventor Mind (brilliant mind in military tools, inventing new effective tools with enhancement for unexpected situations)",
+        "Terrain Manipulation (an ability to re-architect the contour of terrain to give strategic advantages in battlefield)"
+    ]
+});
+
+function dummySeed() {
+    let docRef = db.collection(COLLECTION_ID)
+        .withConverter(listConverter)
+        .doc(DOC_ID);
+
+    return db.runTransaction((transaction) => {
+        return transaction
+            .get(docRef)
+            .then((doc) => {
+                let key = "users." + hyomin.id;
+                transaction.update(docRef, {
+                    [`${key}`]: hyomin.toObject()
+                })
+            });
+    }).then(() => {
+        console.log("Data appended successfully");
+        location.reload();
+    }).catch((error) => {
+        console.log("Error: " + error);
+        alert(`Error: ${error}`);
+    })
+}

@@ -1,6 +1,13 @@
 body {
     text-align: center;
     margin: 0 auto;
+    background-image: url('https://pbs.twimg.com/media/EuA3qS9VkAEhCDw?format=jpg&name=large') !important;
+    background-size: cover !important;
+}
+
+h1.title {
+    font-size: 48px;
+    padding-top: 25px;
 }
 
 .hidden {
@@ -30,7 +37,7 @@ body {
 }
 
 #table_id {
-  max-height: 95vh;
+  max-height: 60vh;
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -58,6 +65,21 @@ body {
 
 #edit-box {
   min-width: 420px !important;
+}
+
+#footer {
+  margin-top: 24px;
+}
+
+#footer h5 {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  color: white;
+}
+
+#footer.login-box {
+  padding: 16px;
+  width: unset !important;
 }
 
   .overlay-box {
