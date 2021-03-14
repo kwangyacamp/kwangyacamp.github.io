@@ -3,6 +3,9 @@ body {
     margin: 0 auto;
     background-image: url('https://pbs.twimg.com/media/EuA3qS9VkAEhCDw?format=jpg&name=large') !important;
     background-size: cover !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 h1.title {
