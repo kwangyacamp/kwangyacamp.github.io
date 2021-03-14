@@ -3,24 +3,31 @@ const searchBar = document.querySelector("#search-bar");
 const overlay = document.querySelector(".overlay");
 const overlayBoxes = document.querySelectorAll(".overlay-box");
 
-const editBox = document.querySelector("#edit-box");
-const editFace = document.querySelector("#edit-faceclaim");
-const editClan = document.querySelector("#edit-clanname");
-const editName = document.querySelector("#edit-name");
-const editProdigy = document.querySelector("#edit-prodigy");
-const editStatus = document.querySelector("#edit-status");
-const editButton = document.querySelector("#edit-button");
-
+const registerBox = document.querySelector("#register-box");
 const registerForm = {
-    firstName: document.querySelector("#first-name"),
-    lastName: document.querySelector("#last-name"),
-    faceClaim: document.querySelector("#face-claim"),
-    cabin: document.querySelector("#cabin"),
-    weapon: document.querySelector("#weapon"),
-    ability1: document.querySelector("#ability-1"),
-    ability2: document.querySelector("#ability-2"),
-    ability3: document.querySelector("#ability-3"),
-    submit: document.querySelector("#register-button")
+    firstName: registerBox.querySelector("#first-name"),
+    lastName: registerBox.querySelector("#last-name"),
+    faceClaim: registerBox.querySelector("#face-claim"),
+    cabin: registerBox.querySelector("#cabin"),
+    weapon: registerBox.querySelector("#weapon"),
+    ability1: registerBox.querySelector("#ability-1"),
+    ability2: registerBox.querySelector("#ability-2"),
+    ability3: registerBox.querySelector("#ability-3"),
+    submit: registerBox.querySelector("#register-button")
+}
+
+
+const editBox = document.querySelector("#edit-box")
+const editForm = {
+    firstName: editBox.querySelector("#first-name"),
+    lastName: editBox.querySelector("#last-name"),
+    faceClaim: editBox.querySelector("#face-claim"),
+    cabin: editBox.querySelector("#cabin"),
+    weapon: editBox.querySelector("#weapon"),
+    ability1: editBox.querySelector("#ability-1"),
+    ability2: editBox.querySelector("#ability-2"),
+    ability3: editBox.querySelector("#ability-3"),
+    submit: editBox.querySelector("#edit-button")
 }
 
 class User {
@@ -194,7 +201,7 @@ function renderTable(dataset) {
             targets: 0,
             render: function (data, type, row, meta) {
                 if (type === 'display') {
-                    data = `<span class="material-icons mdl-button margin-r8" onClick="showEditCivitas('${data}')">edit</span>
+                    data = `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>
                     <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span>`;
                 }
                 return data;
@@ -202,14 +209,14 @@ function renderTable(dataset) {
         }],
         columns: [
             { data: 'id', width: "50px" },
-            { data: 'faceClaim' },
             { data: 'firstName' },
             { data: 'lastName' },
+            { data: 'faceClaim' },
             { data: 'cabin' },
+            { data: 'weapon' },
             { data: 'abilities.0' },
             { data: 'abilities.1' },
-            { data: 'abilities.2' },
-            { data: 'weapon' }
+            { data: 'abilities.2' }
         ]
     });
 
@@ -246,20 +253,10 @@ function deleteUser(id) {
     }
 }
 
-var selectedID = null;
 
-editButton.addEventListener("click", function () {
-    onEditClicked();
-})
-
-function onEditClicked() {
-    submitEditCivitas(selectedID);
-    selectedID = null; // Reset
-}
-
-function showEditCivitas(id) {
-    let civitas = userCollection[id];
-    if (civitas) {
+function showEditUser(id) {
+    let user = userCollection[id];
+    if (user) {
         selectedID = id;
         overlay.classList.remove("hidden");
         overlay.classList.add("flex");
@@ -267,80 +264,72 @@ function showEditCivitas(id) {
         editBox.classList.remove("hidden");
         editBox.classList.add("visible");
 
-        editFace.value = civitas.faceClaim;
-        editClan.value = civitas.firstName;
-        editName.value = civitas.lastName;
-        editProdigy.value = civitas.cabin;
-        editStatus.value = civitas.weapon;
+        editForm.firstName.value = user.firstName;
+        editForm.lastName.value = user.lastName;
+        editForm.faceClaim.value = user.faceClaim;
+        editForm.cabin.value = user.cabin;
+        editForm.weapon.value = user.weapon;
+        editForm.ability1.value = user.abilities[0];
+        editForm.ability2.value = user.abilities[1];
+        editForm.ability3.value = user.abilities[2];
+        editForm.submit.addEventListener("click", () => { submitEditUser(id); });
     }
 }
 
-function submitEditCivitas(id) {
-    db.collection("NPA-DB").doc(id)
-        .set({
-            faceClaim: editFace.value,
-            clanName: editClan.value,
-            name: editName.value,
-            prodigy: editProdigy.value,
-            statusOfFaceClaim: editStatus.value
-        })
-        .then(function () {
-            alert("Data successfully changed! Your data will be displayed after 1x24 hour.\nIf no changes present, please contact admin to make sure your data is up-to-date");
-            //location.reload();
-        })
-        .catch(function (error) {
-            alert("Error writing document: ", error);
+function submitEditUser(id) {
+    var existingUser = null;
+    if (editForm.firstName.value &&
+        editForm.lastName.value &&
+        editForm.faceClaim.value &&
+        editForm.cabin.value &&
+        editForm.weapon.value &&
+        editForm.ability1.value
+        ) {
+        existingUser = new User({
+            id: id,
+            firstName: editForm.firstName.value,
+            lastName: editForm.lastName.value,
+            cabin: editForm.cabin.value,
+            faceClaim: editForm.faceClaim.value,
+            weapon: editForm.weapon.value,
+            abilities: [
+                editForm.ability1.value,
+                editForm.ability2.value,
+                editForm.ability3.value
+            ]
         });
+    } else {
+        alert("All mandatory fields should be filled!");
+        return;
+    }
+    let docRef = db.collection(COLLECTION_ID)
+        .withConverter(listConverter)
+        .doc(DOC_ID);
+
+    return db.runTransaction((transaction) => {
+        return transaction
+            .get(docRef)
+            .then((doc) => {
+                let key = "users." + existingUser.id;
+                transaction.update(docRef, {
+                    [`${key}`]: existingUser.toObject()
+                })
+            });
+    }).then(() => {
+        console.log("Data appended successfully");
+        location.reload();
+    }).catch((error) => {
+        console.log("Error: " + error);
+        alert(`Error: ${error}`);
+    })
 }
+
+window.onclick = onOverlayClicked
 
 function onOverlayClicked(event) {
     if (event.target == overlay) {
         closeOverlay();
     }
-}
-
-window.onclick = onOverlayClicked
-
-function saveSingleDataset(data, refresh = false) {
-    db.collection("NPA-civitas").doc(DB_ID).set(data)
-        .then(() => {
-            alert("Database updated");
-            if (refresh) {
-                location.reload();
-            }
-        })
-        .catch((error) => {
-            alert(error);
-        });
-}
-
-var queryDocument = null;
-
-function updateDatabase(dataset) {
-    db.collection("NPA-civitas").doc(DB_ID).get()
-        .then((doc) => {
-            let students = doc.data();
-
-            // Set/edit existing students
-            dataset.forEach((data) => {
-                students.civitas[data.id] = data;
-
-                // Delete, if needed
-                db.collection("NPA-DB").doc(data.id).delete()
-                    .then(() => { console.log("Data " + data.id + "successfully deleted") });
-            })
-
-            saveSingleDataset(students, true);
-        })
-}
-
-function dumpToCSV() {
-    var output = "ID;Clan;Name;Prodigy;Status";
-    queryResult.forEach((user) => {
-        var toAppend = "\n" + user.id + ";" + user.clanName + ";" + user.name + ";" + user.prodigy + ";" + user.statusOfFaceClaim;
-        output += toAppend
-    })
-    return output;
 }
 
 function closeOverlay() {
