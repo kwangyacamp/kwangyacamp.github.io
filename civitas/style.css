@@ -1,17 +1,6 @@
 body {
     text-align: center;
     margin: 0 auto;
-    background-image: url('https://pbs.twimg.com/media/Evm4Oc5VgAApsot?format=jpg&name=large') !important;
-    background-size: cover !important;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-
-h1.title {
-    font-size: 48px;
-    padding-top: 25px;
-    color: #fff;
 }
 
 .hidden {
@@ -32,18 +21,12 @@ h1.title {
 }
 
 .container {
-  width: 1600px;
+  width: 1280px;
   margin: 0 auto;
 }
 
 .left-sidebar {
   margin-right: 12px;
-}
-
-#table_id {
-  max-height: 60vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
 }
 
 .overlay {
@@ -60,31 +43,12 @@ h1.title {
     min-width: 350px;
     width: fit-content;
     padding: 40px;
-    background: #000;
+    background: rgba(0,0,0,.5);
     box-sizing: border-box;
     box-shadow: 0 15px 25px rgba(0,0,0,.6);
     border-radius: 10px;
     text-align: center;
-}
-
-#edit-box {
-  min-width: 420px !important;
-}
-
-#footer {
-  margin-top: 24px;
-}
-
-#footer h6 {
-  margin-top: 6px;
-  margin-bottom: 6px;
-  color: white;
-}
-
-#footer.login-box {
-  padding: 16px;
-  width: unset !important;
-}
+  }
 
   .overlay-box {
     background: black;
@@ -101,24 +65,17 @@ h1.title {
     position: relative;
   }
   
-  .login-box .user-box input,
-  .login-box .user-box select,
-  .login-box .user-box textarea {
+  .login-box .user-box input,select {
     width: 100%;
     padding: 10px 0;
     font-size: 16px;
     color: #fff;
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     border: none;
     border-bottom: 1px solid #fff;
     outline: none;
     background: transparent;
   }
-
-  .login-box .user-box textarea {
-    font-size: 13px !important;
-  }
-
   .login-box .user-box option {
     font-size: 16px;
     color: #000;
@@ -133,17 +90,14 @@ h1.title {
     font-size: 16px;
     color: #fff;
     pointer-events: none;
-    transition: .3s;
+    transition: .5s;
   }
   
   .login-box .user-box input:focus ~ label,
-  .login-box .user-box input:valid ~ label,
-  .login-box .user-box textarea:focus ~ label,
-  .login-box .user-box textarea:valid ~ label,
-  .login-box .user-box select ~ label {
+  .login-box .user-box input:valid ~ label {
     top: -20px;
     left: 0;
-    color: #d8a920;
+    color: #03e9f4;
     font-size: 12px;
   }
   
@@ -151,7 +105,7 @@ h1.title {
     position: relative;
     display: inline-block;
     padding: 10px 20px;
-    color: #d8a920;
+    color: #03e9f4;
     font-size: 16px;
     text-decoration: none;
     text-transform: uppercase;
@@ -162,13 +116,13 @@ h1.title {
   }
   
   .login-box a:hover {
-    background: #d8a920;
+    background: #03e9f4;
     color: #fff;
     border-radius: 5px;
-    box-shadow: 0 0 5px #d8a920,
-                0 0 25px #d8a920,
-                0 0 50px #d8a920,
-                0 0 100px #d8a920;
+    box-shadow: 0 0 5px #03e9f4,
+                0 0 25px #03e9f4,
+                0 0 50px #03e9f4,
+                0 0 100px #03e9f4;
   }
   
   .login-box a span {
@@ -181,7 +135,7 @@ h1.title {
     left: -100%;
     width: 100%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #d8a920);
+    background: linear-gradient(90deg, transparent, #03e9f4);
     animation: btn-anim1 1s linear infinite;
   }
   
@@ -199,7 +153,7 @@ h1.title {
     right: 0;
     width: 2px;
     height: 100%;
-    background: linear-gradient(180deg, transparent, #d8a920);
+    background: linear-gradient(180deg, transparent, #03e9f4);
     animation: btn-anim2 1s linear infinite;
     animation-delay: .25s
   }
@@ -218,7 +172,7 @@ h1.title {
     right: -100%;
     width: 100%;
     height: 2px;
-    background: linear-gradient(270deg, transparent, #d8a920);
+    background: linear-gradient(270deg, transparent, #03e9f4);
     animation: btn-anim3 1s linear infinite;
     animation-delay: .5s
   }
@@ -237,7 +191,7 @@ h1.title {
     left: 0;
     width: 2px;
     height: 100%;
-    background: linear-gradient(360deg, transparent, #d8a920);
+    background: linear-gradient(360deg, transparent, #03e9f4);
     animation: btn-anim4 1s linear infinite;
     animation-delay: .75s
   }
