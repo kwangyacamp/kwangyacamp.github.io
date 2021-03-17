@@ -12,6 +12,7 @@ h1.title {
     font-size: 48px;
     padding-top: 25px;
     color: #fff;
+    cursor: pointer;
 }
 
 .hidden {

@@ -80,6 +80,21 @@ class User {
         }
     }
 
+    toFlatObject() {
+        return {
+            id: this.id,
+            status: this.status,
+            fullName: this.fullName,
+            alias: this.alias,
+            cabin: this.cabin,
+            faceClaim: this.faceClaim,
+            weapon: this.weapon,
+            ability1: this.abilities[0],
+            ability2: this.abilities[1],
+            ability3: this.abilities[2],
+        }
+    }
+
     getID() {
         var dt = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
@@ -200,7 +215,6 @@ function loadUsers() {
         .then((doc) => {
             userCollection = doc.data().users;
             flattenUsers = Object.keys(userCollection).map((id) => userCollection[id].toObject());
-            onLoadUserSuccess(flattenUsers);
             renderTable(flattenUsers);
         })
 }
@@ -363,52 +377,46 @@ function closeOverlay() {
 }
 
 window.onload = loadUsers;
+downloadButton.onclick = () => { dumpToExcel(userCollection) }
 
-let hyomin = new User({
-    fullName: "Choi",
-    alias: "Hyomin",
-    cabin: "Athena",
-    faceClaim: "Chuuunibyou",
-    weapon: "Overture (a transforming gunblade) or Bisecting Shears (a pair siderite blades)",
-    abilities: [
-        "Inspiring Wisdom (rally people and boost morale)",
-        "Inventor Mind (brilliant mind in military tools, inventing new effective tools with enhancement for unexpected situations)",
-        "Terrain Manipulation (an ability to re-architect the contour of terrain to give strategic advantages in battlefield)"
-    ]
-});
+function dumpToExcel(userCollection) {
+    let workbook = XLSX.utils.book_new();
+    workbook.Props = {
+        Title: "Kwangya Camp Database",
+        Subject: "Database",
+        Author: "Mr. J",
+        CreatedDate: new Date()
+    };
+    workbook.SheetNames.push("Trainees");
 
-function dummySeed() {
-    let docRef = db.collection(COLLECTION_ID)
-        .withConverter(listConverter)
-        .doc(DOC_ID);
+    let header = new User({
+        id: "ID",
+        fullName: "Full Name",
+        status: "Status",
+        alias: "Alias",
+        cabin: "Cabin",
+        faceClaim: "Face Claim",
+        weapon: "Weapons",
+        abilities: [
+            "Ability 1",
+            "Ability 2",
+            "Ability 3"
+        ]
+    });
+    let withHeader = [header.toFlatObject()].concat(Object.keys(userCollection).map((id) => userCollection[id].toFlatObject()));
 
-    return db.runTransaction((transaction) => {
-        return transaction
-            .get(docRef)
-            .then((doc) => {
-                let key = "users." + hyomin.id;
-                transaction.update(docRef, {
-                    [`${key}`]: hyomin.toObject()
-                })
-            });
-    }).then(() => {
-        console.log("Data appended successfully");
-        location.reload();
-    }).catch((error) => {
-        console.log("Error: " + error);
-        alert(`Error: ${error}`);
-    })
+    var worksheet = XLSX.utils.json_to_sheet(withHeader,
+        { header:["id", "status", "fullName", "alias", "cabin", "faceClaim", "weapon", "ability1", "ability2", "ability3"], skipHeader:true }
+    );
+
+    workbook.Sheets["Trainees"] = worksheet;
+    var exportedFile = XLSX.write(workbook, { bookType:'xlsx', type: 'binary' });
+    saveAs(new Blob([s2ab(exportedFile)],{ type:"application/octet-stream" }), 'kwangya-camp-database.xlsx');
 }
 
-function onLoadUserSuccess(flattenUsers) {
-    downloadButton.setAttribute("href", `data:text/plain;charset=utf-8,${encodeURIComponent(dumpToCSV(flattenUsers))}`);
-}
-
-function dumpToCSV(userList) {
-    var output = "ID;Status;Full Name;Alias;Cabin;Face Claim;Weapon;Ability 1; Ability 2; Ability 3";
-    userList.forEach((user) => {
-        var row = `\n${user.id};${user.status};${user.fullName};${user.alias};${user.cabin};${user.faceClaim};${user.weapon};${user.abilities[0]};${user.abilities[1]};${user.abilities[2]}`;
-        output += row;
-    })
-    return output;
+function s2ab(s) { 
+    var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+    var view = new Uint8Array(buf);  //create uint8array as viewer
+    for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    return buf;    
 }
