@@ -5,8 +5,8 @@ const overlayBoxes = document.querySelectorAll(".overlay-box");
 
 const registerBox = document.querySelector("#register-box");
 const registerForm = {
-    firstName: registerBox.querySelector("#first-name"),
-    lastName: registerBox.querySelector("#last-name"),
+    fullName: registerBox.querySelector("#full-name"),
+    alias: registerBox.querySelector("#alias"),
     faceClaim: registerBox.querySelector("#face-claim"),
     cabin: registerBox.querySelector("#cabin"),
     weapon: registerBox.querySelector("#weapon"),
@@ -19,21 +19,28 @@ const registerForm = {
 
 const editBox = document.querySelector("#edit-box")
 const editForm = {
-    firstName: editBox.querySelector("#first-name"),
-    lastName: editBox.querySelector("#last-name"),
+    fullName: editBox.querySelector("#full-name"),
+    alias: editBox.querySelector("#alias"),
     faceClaim: editBox.querySelector("#face-claim"),
     cabin: editBox.querySelector("#cabin"),
     weapon: editBox.querySelector("#weapon"),
     ability1: editBox.querySelector("#ability-1"),
     ability2: editBox.querySelector("#ability-2"),
     ability3: editBox.querySelector("#ability-3"),
+    status: editBox.querySelector("#status"),
     submit: editBox.querySelector("#edit-button")
+}
+
+const Status = {
+    ACTIVE: "🟢 Active",
+    INACTIVE: "🔴 Inactive",
+    IN_REST: "⚪ In Rest" 
 }
 
 class User {
     constructor(user) {
-        this.firstName = user.firstName;
-        this.lastName = user.lastName;
+        this.fullName = user.fullName;
+        this.alias = user.alias;
         this.cabin = user.cabin;
         this.faceClaim = user.faceClaim;
         
@@ -50,17 +57,24 @@ class User {
                 this.abilities[index] = ability;
             })
         }
+
+        if (user.status) {
+            this.status = user.status;
+        } else {
+            this.status = Status.ACTIVE;
+        }
     }
 
     toObject() {
         return {
             id: this.id,
-            firstName: this.firstName,
-            lastName: this.lastName,
+            fullName: this.fullName,
+            alias: this.alias,
             cabin: this.cabin,
             faceClaim: this.faceClaim,
             weapon: this.weapon,
-            abilities: this.abilities
+            abilities: this.abilities,
+            status: this.status
         }
     }
 
@@ -110,16 +124,16 @@ const DOC_ID = "users"
 const DB_ID = "members"
 
 let ghost = new User({
-    firstName: "Jin",
-    lastName: "Sakai",
+    fullName: "Jin Sakai",
+    alias: "Ghost",
     cabin: "Ghost",
     faceClaim: "imgur.com",
     weapon: "Katana & Tanto",
     abilities: ["Heavenly Strike", "Perfect Parry", "Perfect Dodge"]
 });
 let shimura = new User({
-    firstName: "Lord",
-    lastName: "Shimura",
+    fullName: "Lord Shimura",
+    alias: "Jito",
     cabin: "Samurai",
     faceClaim: "imgur.com",
     weapon: "Katana",
@@ -128,16 +142,16 @@ let shimura = new User({
 
 function registerUser() {
     var newUser = null;
-    if (registerForm.firstName.value &&
-        registerForm.lastName.value &&
+    if (registerForm.fullName.value &&
+        registerForm.alias.value &&
         registerForm.faceClaim.value &&
         registerForm.cabin.value &&
         registerForm.weapon.value &&
         registerForm.ability1.value
         ) {
         newUser = new User({
-            firstName: registerForm.firstName.value,
-            lastName: registerForm.lastName.value,
+            fullName: registerForm.fullName.value,
+            alias: registerForm.alias.value,
             cabin: registerForm.cabin.value,
             faceClaim: registerForm.faceClaim.value,
             weapon: registerForm.weapon.value,
@@ -209,9 +223,10 @@ function renderTable(dataset) {
             }
         }],
         columns: [
-            { data: 'id', width: "50px" },
-            { data: 'firstName' },
-            { data: 'lastName' },
+            { data: 'id', width: "65px" },
+            { data: 'status' },
+            { data: 'fullName' },
+            { data: 'alias' },
             { data: 'faceClaim' },
             { data: 'cabin' },
             { data: 'weapon' },
@@ -265,22 +280,23 @@ function showEditUser(id) {
         editBox.classList.remove("hidden");
         editBox.classList.add("visible");
 
-        editForm.firstName.value = user.firstName;
-        editForm.lastName.value = user.lastName;
+        editForm.fullName.value = user.fullName;
+        editForm.alias.value = user.alias;
         editForm.faceClaim.value = user.faceClaim;
         editForm.cabin.value = user.cabin;
         editForm.weapon.value = user.weapon;
         editForm.ability1.value = user.abilities[0];
         editForm.ability2.value = user.abilities[1];
         editForm.ability3.value = user.abilities[2];
+        editForm.status.value = user.status;
         editForm.submit.addEventListener("click", () => { submitEditUser(id); });
     }
 }
 
 function submitEditUser(id) {
     var existingUser = null;
-    if (editForm.firstName.value &&
-        editForm.lastName.value &&
+    if (editForm.fullName.value &&
+        editForm.alias.value &&
         editForm.faceClaim.value &&
         editForm.cabin.value &&
         editForm.weapon.value &&
@@ -288,8 +304,8 @@ function submitEditUser(id) {
         ) {
         existingUser = new User({
             id: id,
-            firstName: editForm.firstName.value,
-            lastName: editForm.lastName.value,
+            fullName: editForm.fullName.value,
+            alias: editForm.alias.value,
             cabin: editForm.cabin.value,
             faceClaim: editForm.faceClaim.value,
             weapon: editForm.weapon.value,
@@ -297,7 +313,8 @@ function submitEditUser(id) {
                 editForm.ability1.value,
                 editForm.ability2.value,
                 editForm.ability3.value
-            ]
+            ],
+            status: editForm.status.value
         });
     } else {
         alert("All mandatory fields should be filled!");
@@ -345,8 +362,8 @@ function closeOverlay() {
 window.onload = loadUsers;
 
 let hyomin = new User({
-    firstName: "Choi",
-    lastName: "HHyomin",
+    fullName: "Choi",
+    alias: "Hyomin",
     cabin: "Athena",
     faceClaim: "Chuuunibyou",
     weapon: "Overture (a transforming gunblade) or Bisecting Shears (a pair siderite blades)",

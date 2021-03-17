@@ -32,7 +32,8 @@ h1.title {
 }
 
 .container {
-  width: 1600px;
+  width: 100vw;
+  min-width: 1280px;
   margin: 0 auto;
 }
 
