@@ -174,6 +174,7 @@ function registerUser() {
 }
 
 let userCollection = {};
+let flattenUsers = [];
 
 function loadUsers() {
     db.collection(COLLECTION_ID)
@@ -182,8 +183,8 @@ function loadUsers() {
         .get()
         .then((doc) => {
             userCollection = doc.data().users;
-            let users = Object.keys(userCollection).map((id) => userCollection[id].toObject());
-            renderTable(users);
+            flattenUsers = Object.keys(userCollection).map((id) => userCollection[id].toObject());
+            renderTable(flattenUsers);
         })
 }
 
