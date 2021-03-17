@@ -401,7 +401,7 @@ function dummySeed() {
 }
 
 function onLoadUserSuccess(flattenUsers) {
-    downloadButton.setAttribute("href", `data.text/plain;charset=utf-8,${encodeURIComponent(dumpToCSV(flattenUsers))}`);
+    downloadButton.setAttribute("href", `data:text/plain;charset=utf-8,${encodeURIComponent(dumpToCSV(flattenUsers))}`);
 }
 
 function dumpToCSV(userList) {
