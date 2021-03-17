@@ -3,6 +3,8 @@ const searchBar = document.querySelector("#search-bar");
 const overlay = document.querySelector(".overlay");
 const overlayBoxes = document.querySelectorAll(".overlay-box");
 
+var downloadButton = document.querySelector("#download-button");
+
 const registerBox = document.querySelector("#register-box");
 const registerForm = {
     fullName: registerBox.querySelector("#full-name"),
@@ -198,6 +200,7 @@ function loadUsers() {
         .then((doc) => {
             userCollection = doc.data().users;
             flattenUsers = Object.keys(userCollection).map((id) => userCollection[id].toObject());
+            onLoadUserSuccess(flattenUsers);
             renderTable(flattenUsers);
         })
 }
@@ -395,4 +398,17 @@ function dummySeed() {
         console.log("Error: " + error);
         alert(`Error: ${error}`);
     })
+}
+
+function onLoadUserSuccess(flattenUsers) {
+    downloadButton.setAttribute("href", `data.text/plain;charset=utf-8,${encodeURIComponent(dumpToCSV(flattenUsers))}`);
+}
+
+function dumpToCSV(userList) {
+    var output = "ID;Status;Full Name;Alias;Cabin;Face Claim;Weapon;Ability 1; Ability 2; Ability 3";
+    userList.forEach((user) => {
+        var row = `\n${user.id};${user.status};${user.fullName};${user.alias};${user.cabin};${user.faceClaim};${user.weapon};${user.abilities[0]};${user.abilities[1]};${user.abilities[2]}`;
+        output += row;
+    })
+    return output;
 }
