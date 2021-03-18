@@ -43,6 +43,10 @@ function padNumber(digit) {
     return digit > 9? `${digit}` : `0${digit}`; 
 }
 
+function padMillis(digit) {
+    return digit > 99? `${digit}` : digit > 9? `0${digit}` : `00${digit}`;
+}
+
 class User {
     constructor(user) {
         this.fullName = user.fullName;
@@ -107,7 +111,7 @@ class User {
         let hours = padNumber(today.getHours());
         let minutes = padNumber(today.getMinutes());
         let seconds = padNumber(today.getSeconds());
-        let millis = `${today.getMilliseconds()}`;
+        let millis = padMillis(today.getMilliseconds());
         return `${year}${month}${date}-${hours}:${minutes}:${seconds}:${millis}`;
     }
 
