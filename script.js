@@ -250,18 +250,14 @@ function renderTable(dataset) {
         order: [[ 0, "asc" ]],
         autoWidth: false,
         dom: '<"top"i>rt<"bottom"><"clear">',
-        columnDefs: [{
-            targets: 0,
-            render: function (data, type, row, meta) {
-                if (type === 'display') {
-                    data = `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>
-                     <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/><div class="user-id">${data}</div>`;
-                }
-                return data;
-            }
-        }],
         columns: [
-            { data: 'id', width: "65px" },
+            { data: 'id', width: "65px",
+                render: (data, type, row, meta) => {
+                    return `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>
+                        <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>
+                        <div class="user-id">${data}</div>`;
+                }
+            },
             { data: 'status' },
             { data: 'fullName' },
             { data: 'alias' },
