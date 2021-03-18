@@ -173,11 +173,9 @@ let shimura = new User({
     abilities: ["Honor"]
 });
 
-function registerUser(seed = null) {
-    var newUser = seed;
-    if (newUser) {
-        
-    } else if (registerForm.fullName.value &&
+function registerUser() {
+    var newUser = null;
+    if (registerForm.fullName.value &&
         registerForm.alias.value &&
         registerForm.faceClaim.value &&
         registerForm.cabin.value &&
