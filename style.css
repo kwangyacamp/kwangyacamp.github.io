@@ -48,6 +48,12 @@ h1.title {
   overflow-x: hidden;
 }
 
+.user-id {
+  font-size: 0.67em;
+  line-height: 120%;
+  color: rgba(0, 0, 0, 0.5);
+}
+
 .overlay {
   width: 100vw;
   height: 100vh;

@@ -39,6 +39,10 @@ const Status = {
     IN_REST: "⚪ In Rest" 
 }
 
+function padNumber(digit) {
+    return digit > 9? `${digit}` : `0${digit}`; 
+}
+
 class User {
     constructor(user) {
         this.fullName = user.fullName;
@@ -96,6 +100,18 @@ class User {
     }
 
     getID() {
+        let today = new Date();        
+        let year = `${today.getFullYear()}`;
+        let month = padNumber(today.getMonth() + 1);
+        let date = padNumber(today.getDate());
+        let hours = padNumber(today.getHours());
+        let minutes = padNumber(today.getMinutes());
+        let seconds = padNumber(today.getSeconds());
+        let millis = `${today.getMilliseconds()}`;
+        return `${year}${month}${date}-${hours}:${minutes}:${seconds}:${millis}`;
+    }
+
+    getGUID() {
         var dt = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
             var r = (dt + Math.random() * 16) % 16 | 0;
@@ -157,9 +173,11 @@ let shimura = new User({
     abilities: ["Honor"]
 });
 
-function registerUser() {
-    var newUser = null;
-    if (registerForm.fullName.value &&
+function registerUser(seed = null) {
+    var newUser = seed;
+    if (newUser) {
+        
+    } else if (registerForm.fullName.value &&
         registerForm.alias.value &&
         registerForm.faceClaim.value &&
         registerForm.cabin.value &&
@@ -227,6 +245,7 @@ function renderTable(dataset) {
     table = $('#table_id').DataTable({
         paging: true,
         data: dataset,
+        order: [[ 0, "asc" ]],
         autoWidth: false,
         dom: '<"top"i>rt<"bottom"><"clear">',
         columnDefs: [{
@@ -234,7 +253,7 @@ function renderTable(dataset) {
             render: function (data, type, row, meta) {
                 if (type === 'display') {
                     data = `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>
-                    <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span>`;
+                     <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/><div class="user-id">${data}</div>`;
                 }
                 return data;
             }
