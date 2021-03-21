@@ -5,6 +5,8 @@ const overlayBoxes = document.querySelectorAll(".overlay-box");
 
 var downloadButton = document.querySelector("#download-button");
 
+const showRegisterButton = document.querySelector("#show-register-form");
+
 const registerBox = document.querySelector("#register-box");
 const registerForm = {
     fullName: registerBox.querySelector("#full-name"),
@@ -303,6 +305,15 @@ function deleteUser(id) {
     }
 }
 
+function showRegisterUser() {
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+
+    registerBox.classList.remove("hidden");
+    registerBox.classList.add("visible");
+}
+
+showRegisterButton.onclick = showRegisterUser;
 
 function showEditUser(id) {
     let user = userCollection[id];
