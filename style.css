@@ -54,7 +54,7 @@ h1.title {
 }
 
 #table_id {
-  max-height: calc(100vh - 415px);
+  height: calc(100vh - 415px);
   overflow-y: scroll;
   overflow-x: hidden;
 }

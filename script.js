@@ -281,7 +281,8 @@ function renderTable(dataset) {
 
 function deleteUser(id) {
     let user = userCollection[id];
-    if (user) {
+    let isCast = ["lee jeno", "lee mark", "osaki shotaro", "huang renjun", "liu yangyang", "lee jaemin", "lee haechan"].includes(user.fullName.toLowerCase());
+    if (user && !isCast) {
         if (confirm("Are you sure you want to delete?")) {
             let docRef = db.collection(COLLECTION_ID)
                 .withConverter(listConverter)
