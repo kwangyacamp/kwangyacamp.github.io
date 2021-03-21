@@ -162,21 +162,23 @@ const COLLECTION_ID = "trainees";
 const DOC_ID = "users"
 const DB_ID = "members"
 
-let ghost = new User({
-    fullName: "Jin Sakai",
-    alias: "Ghost",
-    cabin: "Ghost",
-    faceClaim: "imgur.com",
-    weapon: "Katana & Tanto",
-    abilities: ["Heavenly Strike", "Perfect Parry", "Perfect Dodge"]
+let mark = new User({
+    id: "20210318-15:20:04:300",
+    fullName: "Lee Mark",
+    alias: "@thunderonmark",
+    cabin: "Zeus",
+    faceClaim: "Lee Mark (NCT)",
+    weapon: "a Roman Gladius made of Imperial Gold.",
+    abilities: ["All the monsters want him to be perished.", "Undeniably powerful.", "Can cast a lightning with his fingers."]
 });
-let shimura = new User({
-    fullName: "Lord Shimura",
-    alias: "Jito",
-    cabin: "Samurai",
-    faceClaim: "imgur.com",
-    weapon: "Katana",
-    abilities: ["Honor"]
+let haechan = new User({
+    id: "20210318-15:40:58:035",
+    fullName: "Lee Haechan",
+    alias: "Coming soon.",
+    cabin: "UNCLAIMED",
+    faceClaim: "Lee Haechan (NCT)",
+    weapon: "Coming soon.",
+    abilities: ["Coming soon.", "Coming soon.", "Coming soon."]
 });
 
 function registerUser() {
@@ -226,6 +228,29 @@ function registerUser() {
     })
 }
 
+function seedUser(newUser) {
+    let docRef = db.collection(COLLECTION_ID)
+        .withConverter(listConverter)
+        .doc(DOC_ID);
+
+    return db.runTransaction((transaction) => {
+        return transaction
+            .get(docRef)
+            .then((doc) => {
+                let key = "users." + newUser.id;
+                transaction.update(docRef, {
+                    [`${key}`]: newUser.toObject()
+                })
+            });
+    }).then(() => {
+        console.log("Data appended successfully");
+        location.reload();
+    }).catch((error) => {
+        console.log("Error: " + error);
+        alert(`Error: ${error}`);
+    })
+}
+
 let userCollection = {};
 let flattenUsers = [];
 
@@ -247,7 +272,7 @@ var table;
 
 function renderTable(dataset) {
     table = $('#table_id').DataTable({
-        paging: true,
+        paging: false,
         data: dataset,
         order: [[ 0, "asc" ]],
         autoWidth: false,
