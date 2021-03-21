@@ -255,9 +255,9 @@ function renderTable(dataset) {
         columns: [
             { data: 'id', width: "65px",
                 render: (data, type, row, meta) => {
-                    return `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>
-                        <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>
-                        <div class="user-id">${data}</div>`;
+                    return `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>` +
+                        // `<span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>` +
+                        `<div class="user-id">${data}</div>`;
                 }
             },
             { data: 'status' },
