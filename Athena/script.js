@@ -1,6 +1,6 @@
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(ScrollToPlugin);
-gsap.registerPlugin(SplitText);
+// gsap.registerPlugin(SplitText);
 
 console.clear();
 
@@ -11,8 +11,8 @@ const stage = select('.stage');
 const slides = selectAll(".slide");
 const links = selectAll(".slide__scroll-link");
 const titles = selectAll('.col__content-title');
-const introTitle = new SplitText('.intro__title', {type: "lines", linesClass: "intro-line"});
-const splitTitles = new SplitText(titles, {type: "lines, chars", linesClass: "line", charsClass: "char", position: "relative" });
+// const introTitle = new SplitText('.intro__title', {type: "lines", linesClass: "intro-line"});
+// const splitTitles = new SplitText(titles, {type: "lines, chars", linesClass: "line", charsClass: "char", position: "relative" });
 let slideID = 0;
 
 function initHeader() {
