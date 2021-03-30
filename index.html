@@ -14,6 +14,9 @@
     <script src="scripts/firebase.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+    <script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" data-ad-client="ca-pub-7474404475584319" async></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.semanticui.min.css">
@@ -22,67 +25,14 @@
 </head>
 
 <body>
-    <h1 class="title">Kwangya Camp Database</h1>
-
     <div class="container">
+        <h1 class="title" id="download-button">Kwangya Camp Database</h1>
+
+        <button id="show-register-form">REGISTER NEW DEMIGOD</button>
+
         <div class="flex">
-            <div class="login-box left-sidebar" id="register-box">
-                <h2>New Demigod Biodata</h2>
-                <form>
-                    <div class="user-box">
-                        <input type="text" name="" required="" id="full-name">
-                        <label>Full Name</label>
-                    </div>
-                    <div class="user-box">
-                        <input type="text" name="" required="" id="alias">
-                        <label>Alias</label>
-                    </div>
-                    <div class="user-box">
-                        <input type="text" name="" required="" id="face-claim">
-                        <label>Face Claim</label>
-                    </div>
-                    <div class="user-box">
-                        <select name="cars" id="cabin">
-                            <option value="Aphrodite">Aphrodite</option>
-                            <option value="Apollo">Apollo</option>
-                            <option value="Ares">Ares</option>
-                            <option value="Athena">Athena</option>
-                            <option value="Demeter">Demeter</option>
-                            <option value="Dionysus">Dionysus</option>
-                            <option value="Hephaestus">Hephaestus</option>
-                            <option value="Hermes">Hermes</option>
-                        </select>
-                        <label>Descendant of</label>
-                    </div>
-                    <div class="user-box">
-                        <textarea id="ability-1" rows="3"></textarea>
-                        <label>Ability 1 (mandatory)</label>
-                    </div>
-                    <div class="user-box">
-                        <textarea id="ability-2" rows="3"></textarea>
-                        <label>Ability 2 (optional)</label>
-                    </div>
-                    <div class="user-box">
-                        <textarea id="ability-3" rows="3"></textarea>
-                        <label>Ability 3 (optional)</label>
-                    </div>
-                    <div class="user-box">
-                        <input type="text" name="" required="" id="weapon">
-                        <label>Weapon</label>
-                    </div>
-
-                    <a href="#" id="register-button">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        Register
-                    </a>
-                </form>
-            </div>
-
             <div class="right-sidebar">
-                <div class="login-box visible">
+                <div class="login-box visible transparent">
                     <div class="user-box">
                         <input type="text" name="" required="" id="search-bar">
                         <label>Search</label>
@@ -94,7 +44,7 @@
                                 <th>Actions</th>
                                 <th>Status</th>
                                 <th>Full Name</th>
-                                <th>Alias</th>
+                                <th>Twitter</th>
                                 <th>FaceClaim</th>
                                 <th>Cabin</th>
                                 <th>Weapon</th>
@@ -108,7 +58,7 @@
                                 <th>Actions</th>
                                 <th>Status</th>
                                 <th>Full Name</th>
-                                <th>Alias</th>
+                                <th>Twitter</th>
                                 <th>FaceClaim</th>
                                 <th>Cabin</th>
                                 <th>Weapon</th>
@@ -139,7 +89,7 @@
                 </div>
                 <div class="user-box">
                     <input type="text" name="" required="" id="alias">
-                    <label>Alias</label>
+                    <label>Twitter Username</label>
                 </div>
                 <div class="user-box">
                     <input type="text" name="" required="" id="face-claim">
@@ -159,6 +109,10 @@
                     <label>Descendant of</label>
                 </div>
                 <div class="user-box">
+                    <input type="text" name="" required="" id="weapon">
+                    <label>Weapon</label>
+                </div>
+                <div class="user-box">
                     <textarea id="ability-1" rows="3"></textarea>
                     <label>Ability 1 (mandatory)</label>
                 </div>
@@ -169,10 +123,6 @@
                 <div class="user-box">
                     <textarea id="ability-3" rows="3"></textarea>
                     <label>Ability 3 (optional)</label>
-                </div>
-                <div class="user-box">
-                    <input type="text" name="" required="" id="weapon">
-                    <label>Weapon</label>
                 </div>
                 <div class="user-box">
                     <select name="cars" id="status">
@@ -189,6 +139,61 @@
                     <span></span>
                     <span></span>
                     Confirm Edit
+                </a>
+            </form>
+        </div>
+
+        <div class="login-box overlay-box hidden" id="register-box">
+            <h2>New Demigod Biodata</h2>
+            <form>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="full-name">
+                    <label>Full Name</label>
+                </div>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="alias">
+                    <label>Twitter Username</label>
+                </div>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="face-claim">
+                    <label>Face Claim</label>
+                </div>
+                <div class="user-box">
+                    <select name="cars" id="cabin">
+                        <option value="Aphrodite">Aphrodite</option>
+                        <option value="Apollo">Apollo</option>
+                        <option value="Ares">Ares</option>
+                        <option value="Athena">Athena</option>
+                        <option value="Demeter">Demeter</option>
+                        <option value="Dionysus">Dionysus</option>
+                        <option value="Hephaestus">Hephaestus</option>
+                        <option value="Hermes">Hermes</option>
+                    </select>
+                    <label>Descendant of</label>
+                </div>
+                <div class="user-box">
+                    <input type="text" name="" required="" id="weapon">
+                    <label>Weapon</label>
+                </div>
+                <div class="user-box">
+                    <textarea id="ability-1" rows="3"></textarea>
+                    <label>Ability 1 (mandatory)</label>
+                </div>
+                <div class="user-box">
+                    <textarea id="ability-2" rows="3"></textarea>
+                    <label>Ability 2 (optional)</label>
+                </div>
+                <div class="user-box">
+                    <textarea id="ability-3" rows="3"></textarea>
+                    <label>Ability 3 (optional)</label>
+                </div>
+
+                <a href="#" id="register-button">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Register
                 </a>
             </form>
         </div>

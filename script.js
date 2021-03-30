@@ -3,6 +3,10 @@ const searchBar = document.querySelector("#search-bar");
 const overlay = document.querySelector(".overlay");
 const overlayBoxes = document.querySelectorAll(".overlay-box");
 
+var downloadButton = document.querySelector("#download-button");
+
+const showRegisterButton = document.querySelector("#show-register-form");
+
 const registerBox = document.querySelector("#register-box");
 const registerForm = {
     fullName: registerBox.querySelector("#full-name"),
@@ -35,6 +39,14 @@ const Status = {
     ACTIVE: "🟢 Active",
     INACTIVE: "🔴 Inactive",
     IN_REST: "⚪ In Rest" 
+}
+
+function padNumber(digit) {
+    return digit > 9? `${digit}` : `0${digit}`; 
+}
+
+function padMillis(digit) {
+    return digit > 99? `${digit}` : digit > 9? `0${digit}` : `00${digit}`;
 }
 
 class User {
@@ -78,7 +90,34 @@ class User {
         }
     }
 
+    toFlatObject() {
+        return {
+            id: this.id,
+            status: this.status,
+            fullName: this.fullName,
+            alias: this.alias,
+            cabin: this.cabin,
+            faceClaim: this.faceClaim,
+            weapon: this.weapon,
+            ability1: this.abilities[0],
+            ability2: this.abilities[1],
+            ability3: this.abilities[2],
+        }
+    }
+
     getID() {
+        let today = new Date();        
+        let year = `${today.getFullYear()}`;
+        let month = padNumber(today.getMonth() + 1);
+        let date = padNumber(today.getDate());
+        let hours = padNumber(today.getHours());
+        let minutes = padNumber(today.getMinutes());
+        let seconds = padNumber(today.getSeconds());
+        let millis = padMillis(today.getMilliseconds());
+        return `${year}${month}${date}-${hours}:${minutes}:${seconds}:${millis}`;
+    }
+
+    getGUID() {
         var dt = new Date().getTime();
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
             var r = (dt + Math.random() * 16) % 16 | 0;
@@ -123,21 +162,23 @@ const COLLECTION_ID = "trainees";
 const DOC_ID = "users"
 const DB_ID = "members"
 
-let ghost = new User({
-    fullName: "Jin Sakai",
-    alias: "Ghost",
-    cabin: "Ghost",
-    faceClaim: "imgur.com",
-    weapon: "Katana & Tanto",
-    abilities: ["Heavenly Strike", "Perfect Parry", "Perfect Dodge"]
+let mark = new User({
+    id: "20210318-15:20:04:300",
+    fullName: "Lee Mark",
+    alias: "@thunderonmark",
+    cabin: "Zeus",
+    faceClaim: "Lee Mark (NCT)",
+    weapon: "a Roman Gladius made of Imperial Gold.",
+    abilities: ["All the monsters want him to be perished.", "Undeniably powerful.", "Can cast a lightning with his fingers."]
 });
-let shimura = new User({
-    fullName: "Lord Shimura",
-    alias: "Jito",
-    cabin: "Samurai",
-    faceClaim: "imgur.com",
-    weapon: "Katana",
-    abilities: ["Honor"]
+let haechan = new User({
+    id: "20210318-15:40:58:035",
+    fullName: "Lee Haechan",
+    alias: "Coming soon.",
+    cabin: "UNCLAIMED",
+    faceClaim: "Lee Haechan (NCT)",
+    weapon: "Coming soon.",
+    abilities: ["Coming soon.", "Coming soon.", "Coming soon."]
 });
 
 function registerUser() {
@@ -187,7 +228,31 @@ function registerUser() {
     })
 }
 
+function seedUser(newUser) {
+    let docRef = db.collection(COLLECTION_ID)
+        .withConverter(listConverter)
+        .doc(DOC_ID);
+
+    return db.runTransaction((transaction) => {
+        return transaction
+            .get(docRef)
+            .then((doc) => {
+                let key = "users." + newUser.id;
+                transaction.update(docRef, {
+                    [`${key}`]: newUser.toObject()
+                })
+            });
+    }).then(() => {
+        console.log("Data appended successfully");
+        location.reload();
+    }).catch((error) => {
+        console.log("Error: " + error);
+        alert(`Error: ${error}`);
+    })
+}
+
 let userCollection = {};
+let flattenUsers = [];
 
 function loadUsers() {
     db.collection(COLLECTION_ID)
@@ -196,8 +261,8 @@ function loadUsers() {
         .get()
         .then((doc) => {
             userCollection = doc.data().users;
-            let users = Object.keys(userCollection).map((id) => userCollection[id].toObject());
-            renderTable(users);
+            flattenUsers = Object.keys(userCollection).map((id) => userCollection[id].toObject());
+            renderTable(flattenUsers);
         })
 }
 
@@ -207,22 +272,19 @@ var table;
 
 function renderTable(dataset) {
     table = $('#table_id').DataTable({
-        paging: true,
+        paging: false,
         data: dataset,
+        order: [[ 0, "asc" ]],
         autoWidth: false,
         dom: '<"top"i>rt<"bottom"><"clear">',
-        columnDefs: [{
-            targets: 0,
-            render: function (data, type, row, meta) {
-                if (type === 'display') {
-                    data = `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>
-                    <span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span>`;
-                }
-                return data;
-            }
-        }],
         columns: [
-            { data: 'id', width: "65px" },
+            { data: 'id', width: "65px",
+                render: (data, type, row, meta) => {
+                    return `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>` +
+                        // `<span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>` +
+                        `<div class="user-id">${data}</div>`;
+                }
+            },
             { data: 'status' },
             { data: 'fullName' },
             { data: 'alias' },
@@ -244,7 +306,8 @@ function renderTable(dataset) {
 
 function deleteUser(id) {
     let user = userCollection[id];
-    if (user) {
+    let isCast = ["lee jeno", "lee mark", "osaki shotaro", "huang renjun", "liu yangyang", "lee jaemin", "lee haechan"].includes(user.fullName.toLowerCase());
+    if (user && !isCast) {
         if (confirm("Are you sure you want to delete?")) {
             let docRef = db.collection(COLLECTION_ID)
                 .withConverter(listConverter)
@@ -268,6 +331,15 @@ function deleteUser(id) {
     }
 }
 
+function showRegisterUser() {
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+
+    registerBox.classList.remove("hidden");
+    registerBox.classList.add("visible");
+}
+
+showRegisterButton.onclick = showRegisterUser;
 
 function showEditUser(id) {
     let user = userCollection[id];
@@ -359,39 +431,46 @@ function closeOverlay() {
 }
 
 window.onload = loadUsers;
+downloadButton.onclick = () => { dumpToExcel(userCollection) }
 
-let hyomin = new User({
-    fullName: "Choi",
-    alias: "Hyomin",
-    cabin: "Athena",
-    faceClaim: "Chuuunibyou",
-    weapon: "Overture (a transforming gunblade) or Bisecting Shears (a pair siderite blades)",
-    abilities: [
-        "Inspiring Wisdom (rally people and boost morale)",
-        "Inventor Mind (brilliant mind in military tools, inventing new effective tools with enhancement for unexpected situations)",
-        "Terrain Manipulation (an ability to re-architect the contour of terrain to give strategic advantages in battlefield)"
-    ]
-});
+function dumpToExcel(userCollection) {
+    let workbook = XLSX.utils.book_new();
+    workbook.Props = {
+        Title: "Kwangya Camp Database",
+        Subject: "Database",
+        Author: "Mr. J",
+        CreatedDate: new Date()
+    };
+    workbook.SheetNames.push("Trainees");
 
-function dummySeed() {
-    let docRef = db.collection(COLLECTION_ID)
-        .withConverter(listConverter)
-        .doc(DOC_ID);
+    let header = new User({
+        id: "ID",
+        fullName: "Full Name",
+        status: "Status",
+        alias: "Alias",
+        cabin: "Cabin",
+        faceClaim: "Face Claim",
+        weapon: "Weapons",
+        abilities: [
+            "Ability 1",
+            "Ability 2",
+            "Ability 3"
+        ]
+    });
+    let withHeader = [header.toFlatObject()].concat(Object.keys(userCollection).map((id) => userCollection[id].toFlatObject()));
 
-    return db.runTransaction((transaction) => {
-        return transaction
-            .get(docRef)
-            .then((doc) => {
-                let key = "users." + hyomin.id;
-                transaction.update(docRef, {
-                    [`${key}`]: hyomin.toObject()
-                })
-            });
-    }).then(() => {
-        console.log("Data appended successfully");
-        location.reload();
-    }).catch((error) => {
-        console.log("Error: " + error);
-        alert(`Error: ${error}`);
-    })
+    var worksheet = XLSX.utils.json_to_sheet(withHeader,
+        { header:["id", "status", "fullName", "alias", "cabin", "faceClaim", "weapon", "ability1", "ability2", "ability3"], skipHeader:true }
+    );
+
+    workbook.Sheets["Trainees"] = worksheet;
+    var exportedFile = XLSX.write(workbook, { bookType:'xlsx', type: 'binary' });
+    saveAs(new Blob([s2ab(exportedFile)],{ type:"application/octet-stream" }), 'kwangya-camp-database.xlsx');
+}
+
+function s2ab(s) { 
+    var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+    var view = new Uint8Array(buf);  //create uint8array as viewer
+    for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    return buf;    
 }
