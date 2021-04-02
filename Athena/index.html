@@ -12,13 +12,20 @@
 <div class="stage">
     <header class="header">
         <div class="logo">Cabin Athena</div>
-        <a href="#" class="nav-btn">
+        <div class="nav-btn">
             <svg class="nav-btn__svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 30">
                 <rect class="nav-rect" width="40" height="2" x="8" y="8" fill="#242423"/>
                 <rect class="nav-rect" width="40" height="2" x="8" y="14" fill="#242423"/>
                 <rect width="40" height="2" x="8" y="20" fill="#242423"/>
             </svg>
-        </a>
+        </div>
+        <ul class="dropdown" style="left: -400px;">
+            <li onclick="scrollToIndex(0)">Home</li>
+            <li onclick="scrollToIndex(1)">Menu 1</li>
+            <li onclick="scrollToIndex(2)">Menu 2</li>
+            <li onclick="scrollToIndex(3)">Menu 3</li>
+            <li onclick="scrollToIndex(4)">Menu 4</li>
+        </ul>
     </header>
     
     <section class="intro slide--0" id="slide-0">

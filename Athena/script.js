@@ -1,3 +1,6 @@
+const menuButton = document.querySelector(".nav-btn");
+const dropdown = document.querySelector(".dropdown");
+
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(ScrollToPlugin);
 // gsap.registerPlugin(SplitText);
@@ -323,6 +326,17 @@ function scrollTop() {
     });
 }
 
+function scrollToIndex(index) {
+    gsap.to(window, {
+        duration: 1.0, 
+        scrollTo:{
+            y: "#slide-" + (index)
+        },
+        ease: "power2.inOut"
+    });
+    slideID = index;
+}
+
 function initKeys() {
     document.addEventListener('keydown', (e) => {
         e.preventDefault();
@@ -356,5 +370,15 @@ function init() {
 }
 
 window.onload = () => {
+
+    menuButton.onclick = () => {
+        console.log("style:" + dropdown.style.left);
+        if (dropdown.style.left == '-400px') {
+            dropdown.style.left = '24px';
+        } else {
+            dropdown.style.left = "-400px";
+        }
+    }
+
 	init();
 };

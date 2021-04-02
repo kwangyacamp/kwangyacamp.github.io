@@ -48,10 +48,12 @@ p {
     ========================================================================== */
 .header {
   position: fixed;
+  width: 300px;
   left: 40px;
   top: 24px;
   z-index: 100;
   display: flex;
+  flex-wrap: wrap;
 }
 @media all and (max-width: 768px) {
   .header {
@@ -74,6 +76,7 @@ p {
 .nav-btn {
   display: block;
   margin: -2px 0 0 56px;
+  cursor: pointer;
 }
 @media all and (max-width: 768px) {
   .nav-btn {
@@ -83,6 +86,30 @@ p {
 
 .nav-btn__svg {
   pointer-events: none;
+}
+
+.dropdown {
+  position: absolute;
+  top: 32px;
+  left: -400px;
+  transition: ease;
+  transition-duration: 0.25s;
+  background: var(--dark);
+  color: white;
+  padding-right: 30px;
+  font-family: "Cinzel", serif;
+}
+
+ul.dropdown li {
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 2.0;
+  list-style-type: square;
+  font-size: 20px;
+}
+
+ul.dropdown li:hover {
+  font-weight: bold;
 }
 
 /*  ========================================================================== 
@@ -347,6 +374,10 @@ p {
   width: 75px;
   height: 53px;
 }
+.slide-link.small {
+  width: 30px;
+  height: 25px;
+}
 .slide-link > * {
   pointer-events: none;
 }
@@ -363,6 +394,11 @@ p {
   border-radius: 50%;
   border: 1px solid var(--dark);
 }
+.slide-link__circ.small {
+  width: 25px;
+  height: 25px;
+  border: 1px solid white;
+}
 
 .slide-link__line {
   position: absolute;
@@ -371,6 +407,13 @@ p {
   width: 64px;
   height: 3px;
   background: var(--dark);
+}
+.slide-link__line.small {
+  top: 12px;
+  left: 0;
+  width: 30px;
+  height: 1px;
+  background: white;
 }
 
 .line {
