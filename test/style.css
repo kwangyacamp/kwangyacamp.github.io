@@ -299,6 +299,7 @@ aside > div > div {
 }
 .main-text.multi-column p {
   margin-bottom: 0.8rem;
+  hyphens: auto;
 }
 
 .hogwarts {
