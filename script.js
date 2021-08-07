@@ -266,7 +266,11 @@ function loadUsers() {
         })
 }
 
-registerForm.submit.addEventListener("click", registerUser);
+registerForm.submit.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    registerUser();
+});
 
 var table;
 
@@ -361,7 +365,11 @@ function showEditUser(id) {
         editForm.ability2.value = user.abilities[1];
         editForm.ability3.value = user.abilities[2];
         editForm.status.value = user.status;
-        editForm.submit.addEventListener("click", () => { submitEditUser(id); });
+        editForm.submit.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            submitEditUser(id);
+        });
     }
 }
 
