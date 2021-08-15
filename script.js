@@ -23,15 +23,15 @@ const registerForm = {
 
 const editBox = document.querySelector("#edit-box")
 const editForm = {
-    fullName: editBox.querySelector("#full-name"),
-    alias: editBox.querySelector("#alias"),
-    faceClaim: editBox.querySelector("#face-claim"),
-    cabin: editBox.querySelector("#cabin"),
-    weapon: editBox.querySelector("#weapon"),
-    ability1: editBox.querySelector("#ability-1"),
-    ability2: editBox.querySelector("#ability-2"),
-    ability3: editBox.querySelector("#ability-3"),
-    status: editBox.querySelector("#status"),
+    fullName: editBox.querySelector("#edit-full-name"),
+    alias: editBox.querySelector("#edit-alias"),
+    faceClaim: editBox.querySelector("#edit-face-claim"),
+    cabin: editBox.querySelector("#edit-cabin"),
+    weapon: editBox.querySelector("#edit-weapon"),
+    ability1: editBox.querySelector("#edit-ability-1"),
+    ability2: editBox.querySelector("#edit-ability-2"),
+    ability3: editBox.querySelector("#edit-ability-3"),
+    status: editBox.querySelector("#edit-status"),
     submit: editBox.querySelector("#edit-button")
 }
 
