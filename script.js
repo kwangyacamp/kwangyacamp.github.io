@@ -351,9 +351,14 @@ function renderTable(dataset) {
                 data: 'id', width: "65px",
                 render: (data, type, row, meta) => {
                     let blacklist = ['@thunderonmark', '@onejsoul', '@shotarobs', '@jianujner', '@wingedchan', '@yangrips', '@jaemyrtle'];
-                    return (blacklist.includes(row.alias) ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`) +
+                    let isOwner = currentUser.uid == row.owner;
+                    let isEditAllowed = isOwner && !blacklist.includes(row.alias)
+                    let isClaimAllowed = !row.owner && !currentAvatar;
+
+                    return `<div class="user-id">${data}</div>` +
+                        (!isEditAllowed ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`) +
                         // `<span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>` +
-                        `<div class="user-id">${data}</div>`;
+                        (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="showEditUser('${data}')">person_add_alt</span><br/>` : '');
                 }
             },
             { data: 'status' },

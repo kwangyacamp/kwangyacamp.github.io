@@ -32,7 +32,8 @@ function firebaseRegister(email, password) {
         });
 }
 
-var currentUser;
+var currentUser = null;
+var currentAvatar = null;
 
 var ui = new firebaseui.auth.AuthUI(firebase.auth());
 
@@ -43,6 +44,7 @@ firebase.auth().onAuthStateChanged((user) => {
         var uid = user.uid;
         console.log(`UID: ${uid}`);
         currentUser = user;
+        queryUser(uid).then(() => {});
     } else {
         currentUser = null;
     }
@@ -54,7 +56,8 @@ function firebaseLogin(container = '#login-box', callback) {
             signInSuccessWithAuthResult: (authResult, redirectUrl) => {
                 if (authResult != null) currentUser = authResult.user;
                 console.log(`sign-in flow => UID: ${currentUser.uid}`);
-                callback(authResult);
+                queryUser(currentUser.uid)
+                    .then(() => callback(authResult));
                 return false;
             },
         },
@@ -64,4 +67,13 @@ function firebaseLogin(container = '#login-box', callback) {
         ],
         // Other config options...
     });
+}
+
+function queryUser(uid) {
+    return db.collection('trainees').doc('accounts')
+        .get()
+        .then(doc => {
+            let userBinding = doc.data().accounts[uid];
+            currentAvatar = userBinding;
+        });
 }
