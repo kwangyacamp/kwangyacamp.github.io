@@ -38,15 +38,15 @@ const editForm = {
 const Status = {
     ACTIVE: "🟢 Active",
     INACTIVE: "🔴 Inactive",
-    IN_REST: "⚪ In Rest" 
+    IN_REST: "⚪ In Rest"
 }
 
 function padNumber(digit) {
-    return digit > 9? `${digit}` : `0${digit}`; 
+    return digit > 9 ? `${digit}` : `0${digit}`;
 }
 
 function padMillis(digit) {
-    return digit > 99? `${digit}` : digit > 9? `0${digit}` : `00${digit}`;
+    return digit > 99 ? `${digit}` : digit > 9 ? `0${digit}` : `00${digit}`;
 }
 
 class User {
@@ -55,7 +55,7 @@ class User {
         this.alias = user.alias;
         this.cabin = user.cabin;
         this.faceClaim = user.faceClaim;
-        
+
         if (!user.id) {
             this.id = this.getID();
         } else {
@@ -106,7 +106,7 @@ class User {
     }
 
     getID() {
-        let today = new Date();        
+        let today = new Date();
         let year = `${today.getFullYear()}`;
         let month = padNumber(today.getMonth() + 1);
         let date = padNumber(today.getDate());
@@ -122,7 +122,7 @@ class User {
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
             var r = (dt + Math.random() * 16) % 16 | 0;
             dt = Math.floor(dt / 16);
-            return (c =='x' ? r : (r & 0x3| 0x8)).toString(16);
+            return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
         return uuid;
     }
@@ -189,7 +189,7 @@ function registerUser() {
         registerForm.cabin.value &&
         registerForm.weapon.value &&
         registerForm.ability1.value
-        ) {
+    ) {
         newUser = new User({
             fullName: registerForm.fullName.value,
             alias: registerForm.alias.value,
@@ -206,9 +206,10 @@ function registerUser() {
         alert("All mandatory fields should be filled!");
         return;
     }
+    let docID = `db_${registerForm.cabin.value.toLowerCase()}`;
     let docRef = db.collection(COLLECTION_ID)
         .withConverter(listConverter)
-        .doc(DOC_ID);
+        .doc(docID);
 
     return db.runTransaction((transaction) => {
         return transaction
@@ -254,6 +255,60 @@ function seedUser(newUser) {
 let userCollection = {};
 let flattenUsers = [];
 
+let db_cabin_id = [
+    "Aphrodite",
+    "Apollo",
+    "Ares",
+    "Athena",
+    "Demeter",
+    "Dionysus",
+    "Hephaestus",
+    "Hermes",
+    "Casts"
+];
+
+let asyncOutput = [];
+
+function asyncPromise(callback = null) {
+    let promises = db_cabin_id.map((cabin) =>
+        db.collection(COLLECTION_ID)
+            .withConverter(listConverter)
+            .doc(`db_${cabin.toLowerCase()}`)
+            .get()
+    );
+
+    flattenUsers = [];
+
+    Promise.all(promises)
+        .then(snapshots => {
+            snapshots.forEach((snapshot, i) => {
+                let userMap = snapshot.data().users;
+                let userList = Object.keys(userMap)
+                    .map((id) => userMap[id].toObject())
+                    .sort((a, b) => a.id > b.id ? 0 : -1);
+
+                flattenUsers = flattenUsers.concat(userList);
+            });
+
+            userCollection = flattenUsers.reduce((map, user) => (map[user.id] = user, map), {});
+            renderTable(flattenUsers);
+        });
+}
+
+function filterToMap(dataset, filterBy) {
+    let filtered = dataset.filter((user) => user.cabin == filterBy);
+    let converted = filtered.reduce((map, user) => (map[user.id] = user, map), {});
+    return converted;
+}
+
+function storeFiltered(dataset, filterBy) {
+    let map = filterToMap(dataset, filterBy);
+    let docID = `db_${filterBy.toLowerCase()}`;
+    db.collection(COLLECTION_ID).doc(docID).set({
+        users: map
+    }).then(() => console.log(`Stored to: ${docID}`));
+}
+
 function loadUsers() {
     db.collection(COLLECTION_ID)
         .withConverter(listConverter)
@@ -262,6 +317,7 @@ function loadUsers() {
         .then((doc) => {
             userCollection = doc.data().users;
             flattenUsers = Object.keys(userCollection).map((id) => userCollection[id].toObject());
+            flattenUsers.sort((a, b) => a.id > b.id ? 0 : -1);
             renderTable(flattenUsers);
         })
 }
@@ -278,11 +334,12 @@ function renderTable(dataset) {
     table = $('#table_id').DataTable({
         paging: false,
         data: dataset,
-        order: [[ 0, "asc" ]],
+        order: [[0, "asc"]],
         autoWidth: false,
         dom: '<"top"i>rt<"bottom"><"clear">',
         columns: [
-            { data: 'id', width: "65px",
+            {
+                data: 'id', width: "65px",
                 render: (data, type, row, meta) => {
                     let blacklist = ['@thunderonmark', '@onejsoul', '@shotarobs', '@jianujner', '@wingedchan', '@yangrips', '@jaemyrtle'];
                     return (blacklist.includes(row.alias) ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`) +
@@ -346,6 +403,7 @@ function showRegisterUser() {
 
 showRegisterButton.onclick = showRegisterUser;
 
+
 function showEditUser(id) {
     let user = userCollection[id];
     if (user) {
@@ -365,11 +423,11 @@ function showEditUser(id) {
         editForm.ability2.value = user.abilities[1];
         editForm.ability3.value = user.abilities[2];
         editForm.status.value = user.status;
-        editForm.submit.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+        editForm.submit.onclick = () => {
+            event.preventDefault();
+            event.stopPropagation();
             submitEditUser(id);
-        });
+        };
     }
 }
 
@@ -381,7 +439,7 @@ function submitEditUser(id) {
         editForm.cabin.value &&
         editForm.weapon.value &&
         editForm.ability1.value
-        ) {
+    ) {
         existingUser = new User({
             id: id,
             fullName: editForm.fullName.value,
@@ -400,9 +458,11 @@ function submitEditUser(id) {
         alert("All mandatory fields should be filled!");
         return;
     }
+    let docID = `db_${editForm.cabin.value.toLowerCase()}`;
+
     let docRef = db.collection(COLLECTION_ID)
         .withConverter(listConverter)
-        .doc(DOC_ID);
+        .doc(docID);
 
     return db.runTransaction((transaction) => {
         return transaction
@@ -422,13 +482,13 @@ function submitEditUser(id) {
     })
 }
 
-window.onclick = onOverlayClicked
-
-function onOverlayClicked(event) {
-    if (event.target == overlay) {
-        closeOverlay();
-    }
-}
+overlay.onclick = closeOverlay;
+overlayBoxes.forEach(box => {
+    box.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+    })
+});
 
 function closeOverlay() {
     overlayBoxes.forEach((box) => {
@@ -439,7 +499,8 @@ function closeOverlay() {
     })
 }
 
-window.onload = loadUsers;
+// window.onload = loadUsers;
+window.onload = asyncPromise;
 downloadButton.onclick = () => { dumpToExcel(userCollection) }
 
 function dumpToExcel(userCollection) {
@@ -469,17 +530,17 @@ function dumpToExcel(userCollection) {
     let withHeader = [header.toFlatObject()].concat(Object.keys(userCollection).map((id) => userCollection[id].toFlatObject()));
 
     var worksheet = XLSX.utils.json_to_sheet(withHeader,
-        { header:["id", "status", "fullName", "alias", "cabin", "faceClaim", "weapon", "ability1", "ability2", "ability3"], skipHeader:true }
+        { header: ["id", "status", "fullName", "alias", "cabin", "faceClaim", "weapon", "ability1", "ability2", "ability3"], skipHeader: true }
     );
 
     workbook.Sheets["Trainees"] = worksheet;
-    var exportedFile = XLSX.write(workbook, { bookType:'xlsx', type: 'binary' });
-    saveAs(new Blob([s2ab(exportedFile)],{ type:"application/octet-stream" }), 'kwangya-camp-database.xlsx');
+    var exportedFile = XLSX.write(workbook, { bookType: 'xlsx', type: 'binary' });
+    saveAs(new Blob([s2ab(exportedFile)], { type: "application/octet-stream" }), 'kwangya-camp-database.xlsx');
 }
 
-function s2ab(s) { 
+function s2ab(s) {
     var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
     var view = new Uint8Array(buf);  //create uint8array as viewer
-    for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
-    return buf;    
+    for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+    return buf;
 }
