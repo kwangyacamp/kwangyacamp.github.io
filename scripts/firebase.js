@@ -53,7 +53,7 @@ function firebaseLogin(container = '#login-box', callback) {
         callbacks: {
             signInSuccessWithAuthResult: (authResult, redirectUrl) => {
                 if (authResult != null) currentUser = authResult.user;
-                console.log(`UID: ${currentUser.uid}`);
+                console.log(`sign-in flow => UID: ${currentUser.uid}`);
                 callback(authResult);
                 return false;
             },

@@ -77,6 +77,12 @@ class User {
         } else {
             this.status = Status.ACTIVE;
         }
+
+        if (user.owner) {
+            this.owner = user.owner;
+        } else {
+            this.owner = "";
+        }
     }
 
     toObject() {
@@ -88,7 +94,8 @@ class User {
             faceClaim: this.faceClaim,
             weapon: this.weapon,
             abilities: this.abilities,
-            status: this.status
+            status: this.status,
+            owner: this.owner,
         }
     }
 
