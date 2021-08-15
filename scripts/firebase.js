@@ -31,3 +31,37 @@ function firebaseRegister(email, password) {
             // ...
         });
 }
+
+var currentUser;
+
+var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        var uid = user.uid;
+        console.log(`UID: ${uid}`);
+        currentUser = user;
+    } else {
+        currentUser = null;
+    }
+});
+
+function firebaseLogin(container = '#login-box', callback) {
+    ui.start(container, {
+        callbacks: {
+            signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+                if (authResult != null) currentUser = authResult.user;
+                console.log(`UID: ${currentUser.uid}`);
+                callback(authResult);
+                return false;
+            },
+        },
+        signInOptions: [
+            firebase.auth.EmailAuthProvider.PROVIDER_ID,
+            firebase.auth.TwitterAuthProvider.PROVIDER_ID
+        ],
+        // Other config options...
+    });
+}

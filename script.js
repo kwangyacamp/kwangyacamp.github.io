@@ -35,6 +35,8 @@ const editForm = {
     submit: editBox.querySelector("#edit-button")
 }
 
+const loginBox = document.querySelector("#login-box");
+
 const Status = {
     ACTIVE: "🟢 Active",
     INACTIVE: "🔴 Inactive",
@@ -403,7 +405,6 @@ function showRegisterUser() {
 
 showRegisterButton.onclick = showRegisterUser;
 
-
 function showEditUser(id) {
     let user = userCollection[id];
     if (user) {
@@ -499,8 +500,20 @@ function closeOverlay() {
     })
 }
 
+function showLoginForm() {
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+    loginBox.classList.remove("hidden");
+    loginBox.classList.add("visible");
+}
+
 // window.onload = loadUsers;
-window.onload = asyncPromise;
+window.onload = () => {
+    asyncPromise();
+    firebaseLogin('#login-box', (authResult) => {
+        closeOverlay();
+    });
+}
 downloadButton.onclick = () => { dumpToExcel(userCollection) }
 
 function dumpToExcel(userCollection) {

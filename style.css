@@ -86,6 +86,12 @@ h1.title {
     text-align: center;
 }
 
+#login-box {
+  width: 90vw !important;
+  min-width: unset;
+  max-width: 440px;
+}
+
 #edit-box {
   min-width: 420px !important;
 }
