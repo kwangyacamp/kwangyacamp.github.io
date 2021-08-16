@@ -170,6 +170,7 @@ const listConverter = {
 const COLLECTION_ID = "trainees";
 const DOC_ID = "users"
 const DB_ID = "members"
+const ACCOUNT_ID = "accounts";
 
 let mark = new User({
     id: "20210318-15:20:04:300",
@@ -192,6 +193,7 @@ let haechan = new User({
 
 function registerUser() {
     var newUser = null;
+    let owner = currentUser != null ? currentUser.uid : null;
     if (registerForm.fullName.value &&
         registerForm.alias.value &&
         registerForm.faceClaim.value &&
@@ -209,7 +211,8 @@ function registerUser() {
                 registerForm.ability1.value,
                 registerForm.ability2.value,
                 registerForm.ability3.value
-            ]
+            ],
+            owner: owner
         });
     } else {
         alert("All mandatory fields should be filled!");
@@ -219,6 +222,7 @@ function registerUser() {
     let docRef = db.collection(COLLECTION_ID)
         .withConverter(listConverter)
         .doc(docID);
+    let accountRef = db.collection(COLLECTION_ID).doc(ACCOUNT_ID);
 
     return db.runTransaction((transaction) => {
         return transaction
@@ -228,6 +232,12 @@ function registerUser() {
                 transaction.update(docRef, {
                     [`${key}`]: newUser.toObject()
                 })
+
+                if (currentUser) {
+                    transaction.update(accountRef, {
+                        [`accounts.${currentUser.uid}`]: newUser.id
+                    });
+                }
             });
     }).then(() => {
         console.log("Data appended successfully");
@@ -235,7 +245,7 @@ function registerUser() {
     }).catch((error) => {
         console.log("Error: " + error);
         alert(`Error: ${error}`);
-    })
+    });
 }
 
 function seedUser(newUser) {
@@ -351,14 +361,14 @@ function renderTable(dataset) {
                 data: 'id', width: "65px",
                 render: (data, type, row, meta) => {
                     let blacklist = ['@thunderonmark', '@onejsoul', '@shotarobs', '@jianujner', '@wingedchan', '@yangrips', '@jaemyrtle'];
-                    let isOwner = currentUser.uid == row.owner;
+                    let isOwner = !!currentUser && currentUser.uid == row.owner;
                     let isEditAllowed = isOwner && !blacklist.includes(row.alias)
-                    let isClaimAllowed = !row.owner && !currentAvatar;
+                    let isClaimAllowed = !blacklist.includes(row.alias) && !row.owner && !currentAvatar && currentUser;
 
                     return `<div class="user-id">${data}</div>` +
                         (!isEditAllowed ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`) +
                         // `<span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>` +
-                        (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="showEditUser('${data}')">person_add_alt</span><br/>` : '');
+                        (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="bindUser('${data}')">person_add_alt</span><br/>` : '');
                 }
             },
             { data: 'status' },
@@ -375,9 +385,17 @@ function renderTable(dataset) {
 
 
     // setup search
-    searchBar.addEventListener("keyup", function (event) {
-        table.search(searchBar.value).draw();
-    });
+    searchBar.addEventListener("keyup", debounce(() => table.search(searchBar.value).draw()));
+}
+
+let i = 0;
+
+function debounce(func, timeout = 300) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
 }
 
 function deleteUser(id) {
@@ -385,9 +403,10 @@ function deleteUser(id) {
     let isCast = ["lee jeno", "lee mark", "osaki shotaro", "huang renjun", "liu yangyang", "lee jaemin", "lee haechan"].includes(user.fullName.toLowerCase());
     if (user && !isCast) {
         if (confirm("Are you sure you want to delete?")) {
+            let docID = `db_${user.cabin.toLowerCase()}`;
             let docRef = db.collection(COLLECTION_ID)
                 .withConverter(listConverter)
-                .doc(DOC_ID);
+                .doc(docID);
 
             return db.runTransaction((transaction) => {
                 return transaction
@@ -517,6 +536,42 @@ function showLoginForm() {
     overlay.classList.add("flex");
     loginBox.classList.remove("hidden");
     loginBox.classList.add("visible");
+}
+
+function logout() {
+    firebase.auth().signOut().then(() => {
+        location.reload();
+    })
+}
+
+function bindUser(avatarID, uid = currentUser.uid) {
+    let accountRef = db.collection(COLLECTION_ID).doc(ACCOUNT_ID);
+
+    let avatar = userCollection[avatarID];
+    let avatarRef = db.collection(COLLECTION_ID).doc(`db_${avatar.cabin.toLowerCase()}`);
+
+    // Bind
+    avatar.owner = uid;
+
+    return db.runTransaction((transaction) => {
+        return transaction
+            .get(accountRef)
+            .then((doc) => {
+                transaction.update(accountRef, {
+                    [`accounts.${uid}`]: avatarID
+                });
+
+                transaction.update(avatarRef, {
+                    [`users.${avatarID}`]: avatar
+                });
+            });
+    }).then(() => {
+        alert(`User ${uid} successfully bound to ${avatar.fullName}`);
+        location.reload();
+    }).catch((error) => {
+        console.log("Error: " + error);
+        alert(`Error: ${error}`);
+    })
 }
 
 // window.onload = loadUsers;

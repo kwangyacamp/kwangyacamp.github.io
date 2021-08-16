@@ -47,6 +47,7 @@ firebase.auth().onAuthStateChanged((user) => {
         queryUser(uid).then(() => {});
     } else {
         currentUser = null;
+        currentAvatar = null;
     }
 });
 
