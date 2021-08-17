@@ -538,7 +538,8 @@ function submitEditUser(id) {
                 editForm.ability2.value,
                 editForm.ability3.value
             ],
-            status: editForm.status.value
+            status: editForm.status.value,
+            owner: currentUser.uid
         });
     } else {
         alert("All mandatory fields should be filled!");
