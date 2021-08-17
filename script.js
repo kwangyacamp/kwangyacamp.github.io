@@ -393,7 +393,7 @@ function renderTable(dataset) {
                     return `<div class="user-id">${data}</div>` +
                         (!isEditAllowed ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`) +
                         // `<span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>` +
-                        (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="showBindUser('${data}')">person_add_alt</span><br/>` : '');
+                        // (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="showBindUser('${data}')">person_add_alt</span><br/>` : '');
                 }
             },
             { data: 'status' },
