@@ -5,9 +5,12 @@ const overlayBoxes = document.querySelectorAll(".overlay-box");
 
 var downloadButton = document.querySelector("#download-button");
 
-const showRegisterButton = document.querySelector("#show-register-form");
+const addUserButton = document.querySelector("#show-register-form");
 const signInButton = document.querySelector("#sign-in-button");
 signInButton.onclick = showLoginForm;
+
+const signOutButton = document.querySelector("#sign-out-button");
+signOutButton.onclick = logout;
 
 const registerBox = document.querySelector("#register-box");
 const registerForm = {
@@ -49,16 +52,33 @@ const welcomeMessage = document.querySelector("#welcome-message");
 
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-        welcomeMessage.innerHTML = "Claim your character in table below or add new character";
-        
+        signInButton.classList.add("hidden");
+        signInButton.classList.remove("inline");
+
+        signOutButton.classList.add("inline");
+        signOutButton.classList.remove("hidden");
+
         var uid = user.uid;
         console.log(`UID: ${uid}`);
         currentUser = user;
-        queryUser(uid).then(() => {});
+        queryUser(uid).then(() => {
+            welcomeMessage.innerHTML = currentAvatar ? "" : "Claim your character in table below or add new character";
+            addUserButton.classList.add(currentAvatar ? "hidden" : "inline");
+            addUserButton.classList.remove(currentAvatar ? "inline" : "hidden");
+
+            asyncPromise();
+        });
     } else {
         welcomeMessage.innerHTML = "Are you new? Sign in to create character or claim your existing character.";
+        signInButton.classList.remove("hidden");
+        signInButton.classList.add("inline");
+        addUserButton.classList.remove("inline");
+        addUserButton.classList.add("hidden");
+
         currentUser = null;
         currentAvatar = null;
+
+        asyncPromise();
     }
 });
 
@@ -391,9 +411,9 @@ function renderTable(dataset) {
                     let isClaimAllowed = !blacklist.includes(row.alias) && !row.owner && !currentAvatar && currentUser;
 
                     return `<div class="user-id">${data}</div>` +
-                        (!isEditAllowed ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`) +
+                        (!isEditAllowed ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`);
                         // `<span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>` +
-                        (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="showBindUser('${data}')">person_add_alt</span><br/>` : '');
+                        // (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="showBindUser('${data}')">person_add_alt</span><br/>` : '');
                 }
             },
             { data: 'status' },
@@ -432,6 +452,8 @@ function deleteUser(id) {
             let docRef = db.collection(COLLECTION_ID)
                 .withConverter(listConverter)
                 .doc(docID);
+            let accountRef = db.collection(COLLECTION_ID)
+                .doc(ACCOUNT_ID);
 
             return db.runTransaction((transaction) => {
                 return transaction
@@ -439,7 +461,14 @@ function deleteUser(id) {
                     .then((doc) => {
                         transaction.update(docRef, {
                             ['users.' + id]: firebase.firestore.FieldValue.delete()
-                        })
+                        });
+
+                        let uid = currentUser ? currentUser.uid : null;
+                        if (uid) {
+                            transaction.update(accountRef, {
+                                [`accounts.${uid}`]: firebase.firestore.FieldValue.delete()
+                            });
+                        }
                     });
             }).then(() => {
                 console.log("Data removed successfully");
@@ -452,18 +481,14 @@ function deleteUser(id) {
 }
 
 function showRegisterUser() {
-    if (!currentAvatar) {
-        overlay.classList.remove("hidden");
-        overlay.classList.add("flex");
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
 
-        registerBox.classList.remove("hidden");
-        registerBox.classList.add("visible");
-    } else {
-        alert('You already have a bound character here. Unable to perform add new character');
-    }
+    registerBox.classList.remove("hidden");
+    registerBox.classList.add("visible");
 }
 
-showRegisterButton.onclick = showRegisterUser;
+addUserButton.onclick = showRegisterUser;
 
 function showEditUser(id) {
     let user = userCollection[id];
@@ -573,7 +598,8 @@ function logout() {
     })
 }
 
-function bindUser(avatarID, uid = currentUser.uid) {
+function bindUser(avatarID, user = currentUser) {
+    let uid = currentUser.uid;
     let accountRef = db.collection(COLLECTION_ID).doc(ACCOUNT_ID);
 
     let avatar = userCollection[avatarID];
@@ -591,11 +617,11 @@ function bindUser(avatarID, uid = currentUser.uid) {
                 });
 
                 transaction.update(avatarRef, {
-                    [`users.${avatarID}`]: avatar
+                    [`users.${avatarID}`]: avatar.toObject()
                 });
             });
     }).then(() => {
-        alert(`User ${uid} successfully bound to ${avatar.fullName}`);
+        alert(`User ${currentUser.displayName} successfully bound to ${avatar.fullName}`);
         location.reload();
     }).catch((error) => {
         console.log("Error: " + error);
@@ -612,16 +638,15 @@ function showBindUser(avatarID) {
     let accountName = currentUser.displayName;
     let avatarName = userCollection[avatarID].fullName;
 
-    bindingForm.text.innerHTML = `Hi, ${accountName}<br/>
-        You are about to claim ${avatarName} as your own. After claim success, only you can edit the biodata.<br/>
-        This process is irreversible. Continue?`;
+    bindingForm.text.innerHTML = `Hi, ${accountName}<br/><br/>
+        DO NOT CLAIM THIS CHARACTER (${avatarName}), <b>IF IT IS NOT YOURS</b>.<br/>
+        Are you sure you want to continue?`;
     bindingForm.confirm.onclick = () => bindUser(avatarID);
     bindingForm.cancel.onclick = closeOverlay;
 }
 
 // window.onload = loadUsers;
 window.onload = () => {
-    asyncPromise();
     firebaseLogin('#login-box', (authResult) => {
         location.reload();
     });

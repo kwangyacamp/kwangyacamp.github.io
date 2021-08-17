@@ -40,10 +40,13 @@ h1.title {
   font-weight: bold;
   cursor: pointer;
   padding: 12px;
+  margin: 0 10px;
 }
 
 #binding-box-caption {
   color: white;
+  font-size: 18px;
+  line-height: 30px;
 }
 #binding-cancel, #binding-confirm {
   display: inline-block;

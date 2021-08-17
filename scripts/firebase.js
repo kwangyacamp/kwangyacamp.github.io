@@ -37,21 +37,6 @@ var currentAvatar = null;
 
 var ui = new firebaseui.auth.AuthUI(firebase.auth());
 
-firebase.auth().onAuthStateChanged((user) => {
-    let welcomeMessage = document.querySelector("#welcome-message");
-    if (user) {
-        // welcomeMessage.innerHTML = "Claim your character in table below or add new character";
-        var uid = user.uid;
-        console.log(`UID: ${uid}`);
-        currentUser = user;
-        queryUser(uid).then(() => {});
-    } else {
-        // welcomeMessage.innerHTML = "Are you new? Sign in to create character or claim your existing character.";
-        currentUser = null;
-        currentAvatar = null;
-    }
-});
-
 function firebaseLogin(container = '#login-box', callback) {
     ui.start(container, {
         callbacks: {
