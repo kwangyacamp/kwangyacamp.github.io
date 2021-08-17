@@ -6,6 +6,8 @@ const overlayBoxes = document.querySelectorAll(".overlay-box");
 var downloadButton = document.querySelector("#download-button");
 
 const showRegisterButton = document.querySelector("#show-register-form");
+const signInButton = document.querySelector("#sign-in-button");
+signInButton.onclick = showLoginForm;
 
 const registerBox = document.querySelector("#register-box");
 const registerForm = {
@@ -38,6 +40,11 @@ const editForm = {
 const loginBox = document.querySelector("#login-box");
 
 const bindingBox = document.querySelector("#binding-box");
+const bindingForm = {
+    text: document.querySelector("#binding-box-caption"),
+    cancel: document.querySelector("#binding-cancel"),
+    confirm: document.querySelector("#binding-confirm"),
+};
 const bindingText = document.querySelector("#binding-box-caption");
 
 const Status = {
@@ -306,7 +313,7 @@ function asyncPromise(callback = null) {
             snapshots.forEach((snapshot, i) => {
                 let userMap = snapshot.data().users;
                 let userList = Object.keys(userMap)
-                    .map((id) => userMap[id].toObject())
+                    .map((id) => userMap[id])
                     .sort((a, b) => a.id > b.id ? 0 : -1);
 
                 flattenUsers = flattenUsers.concat(userList);
@@ -586,16 +593,18 @@ function showBindUser(avatarID) {
     let accountName = currentUser.displayName;
     let avatarName = userCollection[avatarID].fullName;
 
-    bindingText.innerHTML = `Hi, ${accountName}<br/>
+    bindingForm.text.innerHTML = `Hi, ${accountName}<br/>
         You are about to claim ${avatarName} as your own. After claim success, only you can edit the biodata.<br/>
         This process is irreversible. Continue?`;
+    bindingForm.confirm.onclick = () => bindUser(avatarID);
+    bindingForm.cancel.onclick = closeOverlay;
 }
 
 // window.onload = loadUsers;
 window.onload = () => {
     asyncPromise();
     firebaseLogin('#login-box', (authResult) => {
-        closeOverlay();
+        location.reload();
     });
 }
 downloadButton.onclick = () => { dumpToExcel(userCollection) }
