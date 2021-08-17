@@ -30,7 +30,8 @@
     <div class="container">
         <h1 class="title" id="download-button">Kwangya Camp Database</h1>
 
-        <button id="show-register-form">REGISTER NEW DEMIGOD</button>
+        <!-- <p>Are you new? Sign in to create character or claim your existing</p> -->
+        <button id="show-register-form" class="yellow-button">REGISTER NEW DEMIGOD</button>
 
         <div class="flex">
             <div class="right-sidebar">
@@ -204,6 +205,12 @@
         </div>
 
         <div class="login-box overlay-box hidden" id="login-box"></div>
+
+        <div class="login-box overlay-box hidden" id="binding-box">
+            <div id="binding-box-caption">You are about to connect account A and B. This process is irreversible. Continue?</div>
+            <button class="yellow-button" id="binding-cancel">Cancel</button>
+            <button class="yellow-button" id="binding-confirm">Continue</button>
+        </div>
     </div>
     <script src="./script.js"></script>
     <!-- <script src="./login.js"></script> -->

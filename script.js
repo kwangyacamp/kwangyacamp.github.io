@@ -37,6 +37,9 @@ const editForm = {
 
 const loginBox = document.querySelector("#login-box");
 
+const bindingBox = document.querySelector("#binding-box");
+const bindingText = document.querySelector("#binding-box-caption");
+
 const Status = {
     ACTIVE: "🟢 Active",
     INACTIVE: "🔴 Inactive",
@@ -368,7 +371,7 @@ function renderTable(dataset) {
                     return `<div class="user-id">${data}</div>` +
                         (!isEditAllowed ? '' : `<span class="material-icons mdl-button margin-r8" onClick="showEditUser('${data}')">edit</span>`) +
                         // `<span class="material-icons mdl-button" onClick="deleteUser('${data}')">delete_forever</span><br/>` +
-                        (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="bindUser('${data}')">person_add_alt</span><br/>` : '');
+                        (isClaimAllowed ? `<span class="material-icons mdl-button" onClick="showBindUser('${data}')">person_add_alt</span><br/>` : '');
                 }
             },
             { data: 'status' },
@@ -572,6 +575,20 @@ function bindUser(avatarID, uid = currentUser.uid) {
         console.log("Error: " + error);
         alert(`Error: ${error}`);
     })
+}
+
+function showBindUser(avatarID) {
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+    bindingBox.classList.remove("hidden");
+    bindingBox.classList.add("visible");
+
+    let accountName = currentUser.displayName;
+    let avatarName = userCollection[avatarID].fullName;
+
+    bindingText.innerHTML = `Hi, ${accountName}<br/>
+        You are about to claim ${avatarName} as your own. After claim success, only you can edit the biodata.<br/>
+        This process is irreversible. Continue?`;
 }
 
 // window.onload = loadUsers;

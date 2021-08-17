@@ -34,6 +34,9 @@ h1.title {
 
 #show-register-form {
   margin-top: 20px;
+}
+
+.yellow-button {
   background-color: transparent;
   border-radius: 6px;
   color: #d8a920;
@@ -43,10 +46,20 @@ h1.title {
   padding: 12px;
 }
 
+#binding-box-caption {
+  color: white;
+}
+#binding-cancel, #binding-confirm {
+  display: inline-block;
+}
+
 .container {
   width: 100vw;
   min-width: 1280px;
   margin: 0 auto;
+}
+.container p {
+  color: white;
 }
 
 .left-sidebar {
@@ -54,7 +67,7 @@ h1.title {
 }
 
 #table_id {
-  max-height: calc(100vh - 415px);
+  max-height: calc(100vh - 375px);
   overflow-y: scroll;
   overflow-x: hidden;
 }
@@ -84,6 +97,10 @@ h1.title {
     box-shadow: 0 15px 25px rgba(0,0,0,.6);
     border-radius: 10px;
     text-align: center;
+}
+
+.right-sidebar .login-box {
+  padding: 20px 40px;
 }
 
 #login-box {
