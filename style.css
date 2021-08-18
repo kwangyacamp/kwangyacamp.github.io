@@ -309,3 +309,8 @@ h1.title {
   margin-right: 8px;
   margin-top: 8px;
 }
+
+.sorting_1 .mdl-button {
+  min-width: unset;
+  padding: 0 8px;
+}
